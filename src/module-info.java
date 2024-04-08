@@ -1,8 +1,5 @@
 /**
  * 
  */
-/**
- * 
- */
 module AdventOfCode_Java {
 }
