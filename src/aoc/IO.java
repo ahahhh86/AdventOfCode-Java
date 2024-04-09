@@ -3,6 +3,7 @@ package aoc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class IO {
 	private static final String PASS_COLOUR = "\u001B[32m";
 	private static final String FAIL_COLOUR = "\u001B[31m";
 
-	private static final String testFormat = "\t%02d | %8s | %16s | %16s | %8d%n";
+	private static final String testFormat = "\t%02d | %8s | %16s | %16s | %8s%n";
 
 	// private Date date;
 	private long time;
@@ -64,7 +65,8 @@ public class IO {
 		++partCount;
 		if (DEBUG_MODE) {
 			boolean success = result.equals(expected);
-			System.out.printf(testFormat, partCount, success, result, expected, elapsedTime());
+			String elapsed = NumberFormat.getInstance().format(elapsedTime());
+			System.out.printf(testFormat, partCount, success, result, expected, elapsed);
 		} else {
 			System.out.printf("\tPart %d: %16s%n", partCount, result);
 		}
@@ -73,7 +75,7 @@ public class IO {
 	public void startTests() {
 		if (!DEBUG_MODE) { return; }
 
-		final String testForm = testFormat.replace("02d", "2s").replace("8d", "8s");
+		final String testForm = testFormat.replace("02d", "2s");// .replace("8d", "8s");
 
 		time = System.currentTimeMillis();
 
@@ -87,7 +89,8 @@ public class IO {
 		++testCount;
 		boolean success = result.equals(expected);
 		if (!success) { ++failCount; }
-		System.out.printf(testFormat, testCount, success, result, expected, elapsedTime());
+		String elapsed = NumberFormat.getInstance().format(elapsedTime());
+		System.out.printf(testFormat, testCount, success, result, expected, elapsed);
 	}
 
 	public void showTestResults() {

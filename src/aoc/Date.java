@@ -28,13 +28,15 @@ public class Date {
 		DAY24,
 		DAY25;
 
+		private static final int DAY_LENGTH = "DAY".length();
+
 		@Override
 		public String toString() {
-			return "Day " + name().substring(3);
+			return "Day " + name().substring(DAY_LENGTH);
 		}
 
 		public String toFilename() {
-			return name() + ".txt";
+			return name().toLowerCase() + ".txt";
 		}
 	}
 
@@ -51,13 +53,15 @@ public class Date {
 		YEAR2022,
 		YEAR2023;
 
+		private static final int YEAR_LENGTH = "YEAR".length();
+
 		@Override
 		public String toString() {
-			return "Year " + name().substring(4);
+			return "Year " + name().substring(YEAR_LENGTH);
 		}
 
 		public String toFilename() {
-			return name().substring(4) + "/";
+			return name().substring(YEAR_LENGTH) + "/";
 		}
 	}
 
