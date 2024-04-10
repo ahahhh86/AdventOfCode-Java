@@ -41,8 +41,7 @@ public class Position {
 	 *            original Position
 	 */
 	public Position(Position p) {
-		this.x = p.x;
-		this.y = p.y;
+		this(p.x, p.y);
 	}
 
 	/**

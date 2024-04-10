@@ -112,30 +112,29 @@ public class Day01 extends Day00 {
 			input.forEach(i -> instructions.add(new Instruction(i)));
 		}
 
-		private class Part1 {
+		private interface Part0 {
+			Position walk();
+		}
+
+		private class Part1 implements Part0 {
 			private Position pos = new Position(START_POS);
 			private Direction direction = START_DIRECTION;
 
 			private void walkOnce(Instruction i) {
 				direction = direction.turn(i.turn);
-				Position newPos = direction.getVector().scale(i.length);
+				var newPos = direction.getVector().scale(i.length);
 				pos.add(newPos);
 			}
 
-			Position walk() {
+			@Override
+			public Position walk() {
 				instructions.forEach(i -> walkOnce(i));
 				return new Position(pos);
 			}
 
 		}
 
-		int getShortestRoutePart1() {
-			Part1 p = new Part1();
-			Position pos = p.walk();
-			return Math.abs(pos.x) + Math.abs(pos.y);
-		}
-
-		private class Part2 {
+		private class Part2 implements Part0 {
 			private static final Position INVALID_POS = new Position(Integer.MIN_VALUE);
 
 			List<Position> positions = new ArrayList<>(Arrays.asList(START_POS));
@@ -144,7 +143,7 @@ public class Day01 extends Day00 {
 			private Position walkOnce(Instruction instruction) {
 				direction = direction.turn(instruction.turn);
 				for (int i = 0; i < instruction.length; ++i) {
-					Position newPos = new Position(positions.getLast());
+					var newPos = new Position(positions.getLast());
 					newPos.add(direction.getVector());
 
 					if (positions.contains(newPos)) { return newPos; }
@@ -154,9 +153,10 @@ public class Day01 extends Day00 {
 				return new Position(INVALID_POS);
 			}
 
-			Position walk() {
+			@Override
+			public Position walk() {
 				for (Instruction i : instructions) {
-					Position pos = walkOnce(i);
+					var pos = walkOnce(i);
 					if (!pos.equals(INVALID_POS)) { return pos; }
 				}
 
@@ -165,20 +165,27 @@ public class Day01 extends Day00 {
 
 		}
 
-		int getShortestRoutePart2() {
-			Part2 p = new Part2();
-			Position pos = p.walk();
+		static int getShortestRoute(Part0 p) {
+			var pos = p.walk();
 			return Math.abs(pos.x) + Math.abs(pos.y);
+		}
+
+		int getShortestRoutePart1() {
+			return getShortestRoute(new Part1());
+		}
+
+		int getShortestRoutePart2() {
+			return getShortestRoute(new Part2());
 		}
 	}
 
 	public Day01() {
-		super(new Date(Date.Year.YEAR2016, Date.Day.DAY01));
+		super(Date.Year.YEAR2016, Date.Day.DAY01);
 	}
 
 	@Override
 	public void performTests() {
-		City c = new City(Arrays.asList("R2", "L3"));
+		var c = new City(Arrays.asList("R2", "L3"));
 		io.printTest(c.getShortestRoutePart1(), 5);
 
 		c = new City(Arrays.asList("R2", "R2", "R2"));
@@ -193,14 +200,8 @@ public class Day01 extends Day00 {
 
 	@Override
 	public void solvePuzzle() {
-		City c = new City(io.readOneLine(", "));
+		var c = new City(io.readOneLine(", "));
 		io.printResult(c.getShortestRoutePart1(), 236);
 		io.printResult(c.getShortestRoutePart2(), 182);
-	}
-
-	public static void main(String[] args) {
-		Day01 d = new Day01();
-		d.testPuzzle();
-		d.solvePuzzle();
 	}
 }

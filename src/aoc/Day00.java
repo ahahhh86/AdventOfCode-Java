@@ -3,8 +3,8 @@ package aoc;
 public abstract class Day00 {
 	protected IO io;
 
-	public Day00(Date date) {
-		io = new IO(date);
+	public Day00(Date.Year year, Date.Day day) {
+		io = new IO(new Date(year, day));
 	}
 
 
@@ -20,7 +20,7 @@ public abstract class Day00 {
 	public abstract void solvePuzzle();
 
 	public static void main(String[] args) {
-		Day00 d = new year2016.Day02();
+		Day00 d = new year2016.Day04();
 		d.testPuzzle();
 		d.solvePuzzle();
 	}

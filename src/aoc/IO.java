@@ -17,7 +17,7 @@ public class IO {
 	private static final String PASS_COLOUR = "\u001B[32m";
 	private static final String FAIL_COLOUR = "\u001B[31m";
 
-	private static final String testFormat = "\t%02d | %8s | %16s | %16s | %8s%n";
+	private static final String testFormat = "\t%02d | %8s | %24s | %24s | %10s%n";
 
 	// private Date date;
 	private long time;
@@ -34,7 +34,7 @@ public class IO {
 	}
 
 	private long elapsedTime() {
-		long oldTime = time;
+		var oldTime = time;
 		time = System.currentTimeMillis();
 		return (time - oldTime);
 	}
@@ -65,7 +65,7 @@ public class IO {
 		++partCount;
 		if (DEBUG_MODE) {
 			boolean success = result.equals(expected);
-			String elapsed = NumberFormat.getInstance().format(elapsedTime());
+			var elapsed = NumberFormat.getInstance().format(elapsedTime());
 			System.out.printf(testFormat, partCount, success, result, expected, elapsed);
 		} else {
 			System.out.printf("\tPart %d: %16s%n", partCount, result);
@@ -89,7 +89,7 @@ public class IO {
 		++testCount;
 		boolean success = result.equals(expected);
 		if (!success) { ++failCount; }
-		String elapsed = NumberFormat.getInstance().format(elapsedTime());
+		var elapsed = NumberFormat.getInstance().format(elapsedTime());
 		System.out.printf(testFormat, testCount, success, result, expected, elapsed);
 	}
 

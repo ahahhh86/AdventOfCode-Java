@@ -1,4 +1,6 @@
 /*
+ * https://adventofcode.com/2016/day/2
+ * 
  * --- Day 2: Bathroom Security ---
  * You arrive at Easter Bunny Headquarters under cover of darkness. However, you left in such a rush that 
  * you forgot to use the bathroom! Fancy office buildings like this one usually have keypad locks on their 
@@ -64,9 +66,9 @@
  *     Finally, after five more moves, you end at 3.
  * 
  * So, given the actual keypad layout, the code would be 5DB3.
- * 
+ *
  * Using the same instructions in your puzzle input, what is the correct bathroom code?
- * 
+ *
  * Your puzzle answer was 46C91.
  */
 
@@ -238,8 +240,8 @@ public class Day02 extends Day00 {
 		}
 
 		private String findCode(NumPad np) {
-			StringBuilder result = new StringBuilder("");
-			for (List<Direction> i : instructions) {
+			var result = new StringBuilder("");
+			for (var i : instructions) {
 				for (Direction j : i) {
 					np = np.move(j);
 				}
@@ -249,23 +251,23 @@ public class Day02 extends Day00 {
 		}
 
 		String findCodeSquare() {
-			NumPadSquare np = START_POS_SQUARE;
+			var np = START_POS_SQUARE;
 			return findCode(np);
 		}
 
 		String findCodeDiamond() {
-			NumPadDiamond np = START_POS_DIAMOND;
+			var np = START_POS_DIAMOND;
 			return findCode(np);
 		}
 	}
 
 	public Day02() {
-		super(new Date(Date.Year.YEAR2016, Date.Day.DAY02));
+		super(Date.Year.YEAR2016, Date.Day.DAY02);
 	}
 
 	@Override
 	public void performTests() {
-		BathroomCode bc = new BathroomCode(Arrays.asList("ULL", "RRDDD", "LURDL", "UUUUD"));
+		var bc = new BathroomCode(Arrays.asList("ULL", "RRDDD", "LURDL", "UUUUD"));
 		io.printTest(bc.findCodeSquare(), "1985");
 		io.printTest(bc.findCodeDiamond(), "5DB3");
 
@@ -273,7 +275,7 @@ public class Day02 extends Day00 {
 
 	@Override
 	public void solvePuzzle() {
-		BathroomCode bc = new BathroomCode(io.readAllLines());
+		var bc = new BathroomCode(io.readAllLines());
 		io.printResult(bc.findCodeSquare(), "24862");
 		io.printResult(bc.findCodeDiamond(), "46C91");
 	}
