@@ -56,11 +56,10 @@ public class Day03 extends Day00 {
 	private static final int SIDE_COUNT = 3;
 
 	private static List<Integer> getLine(String in) {
-		var strList = new ArrayList<>(Arrays.asList(in.split(" ")));
-		strList.removeIf(i -> i == "");
-		if (strList.size() != SIDE_COUNT) { throw new IllegalArgumentException("Invalid input size."); }
+		var strList = new ArrayList<>(Arrays.asList(in.trim().split(" +")));
+		if (strList.size() != SIDE_COUNT) { throw new IllegalArgumentException("Triangle only works with 3 sides"); }
 
-		var result = new ArrayList<Integer>();
+		var result = new ArrayList<Integer>(SIDE_COUNT);
 		strList.forEach(i -> result.add(Integer.parseInt(i)));
 		return result;
 	}
@@ -76,7 +75,7 @@ public class Day03 extends Day00 {
 
 		boolean isValid() {
 			// @formatter:off
-			return (    sides.get(0) < sides.get(1) + sides.get(2))
+			return (sides.get(0) < sides.get(1) + sides.get(2))
 					&& (sides.get(1) < sides.get(0) + sides.get(2))
 					&& (sides.get(2) < sides.get(0) + sides.get(1));
 			// @formatter:on
@@ -94,19 +93,17 @@ public class Day03 extends Day00 {
 		input.forEach(i -> {
 			result.add(new Triangle(i));
 		});
-
 		return result;
 	}
 
-	// CHECK why swapping values did not work
 	private static List<List<Integer>> transpose(List<List<Integer>> matrix) {
-		if (matrix.size() != matrix.get(0).size()) { throw new IllegalArgumentException("Invalid input size."); }
+		if (matrix.size() != matrix.get(0).size()) { throw new IllegalArgumentException("Invalid matrix size."); }
 
-		List<List<Integer>> result = new ArrayList<>();
 		var loopEnd = matrix.size();
+		var result = new ArrayList<List<Integer>>(loopEnd);
 
 		for (int i = 0; i < loopEnd; ++i) {
-			List<Integer> buffer = new ArrayList<>();
+			var buffer = new ArrayList<Integer>(loopEnd);
 			for (int j = 0; j < loopEnd; ++j) {
 				buffer.add(matrix.get(j).get(i));
 			}
@@ -121,8 +118,15 @@ public class Day03 extends Day00 {
 
 		var result = new ArrayList<Triangle>(input.size());
 		var loopEnd = input.size() - SIDE_COUNT + 1;
+
 		for (int i = 0; i < loopEnd; i += SIDE_COUNT) {
-			var buffer = Arrays.asList(getLine(input.get(i)), getLine(input.get(i + 1)), getLine(input.get(i + 2)));
+			//@formatter:off
+			var buffer = Arrays.asList(
+					getLine(input.get(i)),
+					getLine(input.get(i + 1)),
+					getLine(input.get(i + 2))
+			);
+			//@formatter:on
 			buffer = transpose(buffer);
 
 			for (var line : buffer) {

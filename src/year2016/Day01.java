@@ -165,7 +165,7 @@ public class Day01 extends Day00 {
 
 		}
 
-		static int getShortestRoute(Part0 p) {
+		private static int getShortestRoute(Part0 p) {
 			var pos = p.walk();
 			return Math.abs(pos.x) + Math.abs(pos.y);
 		}

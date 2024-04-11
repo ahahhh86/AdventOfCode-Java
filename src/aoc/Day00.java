@@ -20,7 +20,7 @@ public abstract class Day00 {
 	public abstract void solvePuzzle();
 
 	public static void main(String[] args) {
-		Day00 d = new year2016.Day04();
+		Day00 d = new year2016.Day05();
 		d.testPuzzle();
 		d.solvePuzzle();
 	}

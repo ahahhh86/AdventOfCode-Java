@@ -59,67 +59,81 @@ import aoc.Day00;
 public class Day04 extends Day00 {
 	private static final int CHECKSUM_LENGTH = 5;
 
-	private static class LetterData implements Comparable<LetterData> {
-		Integer count;
-		Character letter;
-
-		LetterData(int c, char l) {
-			count = c;
-			letter = l;
-		}
-
-		@Override
-		public int compareTo(LetterData o) {
-			return (count == o.count) ? letter.compareTo(o.letter) : o.count.compareTo(count);
-		}
-
-		// For Debugging
-		// @Override
-		// public String toString() {
-		// return "[" + count + "|" + letter + "]";
-		// }
-	}
-
 	private static class Room {
-		String name;
-		int sectorId;
-		String checkSum;
+		private static class LetterData implements Comparable<LetterData> {
+			Integer count;
+			Character letter;
+
+			LetterData(int c, char l) {
+				count = c;
+				letter = l;
+			}
+
+			@Override
+			public int compareTo(LetterData o) {
+				// sort: higher count -> lower count, a -> z
+				return (count == o.count) ? letter.compareTo(o.letter) : o.count.compareTo(count);
+			}
+
+			// For Debugging
+			// @Override
+			// public String toString() {
+			// return "[" + count + "|" + letter + "]";
+			// }
+		}
+
+		final String name;
+		final int sectorId;
+		final String checkSum;
 
 		Room(String input) {
-			var buffer = input.split("-(?=\\d)"); // split at "-[Number]", but keep the number
+			var buffer = input.split("-(?=\\d)"); // split at "-[number]", but keep the number
 			name = buffer[0];
-			if (name != name.toLowerCase()) { throw new IllegalArgumentException("name has to be in lower case"); }
 
-			buffer = buffer[1].split("\\[");
+			buffer = buffer[1].split("[\\[\\]]"); // split at "[", also removes trailing "]"
 			sectorId = Integer.parseInt(buffer[0]);
+			checkSum = buffer[1];
 
-			checkSum = buffer[1].substring(0, buffer[1].length() - 1); // remove "]"
+			verifyInput();
+		}
+
+		private void verifyInput() {
+			for (int i = 0; i < name.length(); ++i) {
+				if (!(name.charAt(i) == '-' || Character.isLowerCase(name.charAt(i)))) {
+					throw new IllegalArgumentException("name has to be in lower case");
+				}
+			}
+
 			if (checkSum.length() != CHECKSUM_LENGTH) {
 				throw new IllegalArgumentException("The length of the checkSum has to be " + CHECKSUM_LENGTH);
 			}
 		}
 
-		boolean isDecoy() {
-			List<LetterData> buffer = new ArrayList<>();
+		private List<LetterData> countLetters() {
+			var result = new ArrayList<LetterData>(name.length());
 			for (int i = 0; i < name.length(); ++i) {
 				char c = name.charAt(i);
 				if (c == '-') { continue; }
 				boolean found = false;
 
-				for (var j : buffer) {
+				for (var j : result) {
 					if (j.letter == c) {
 						++j.count;
 						found = true;
 						break;
 					}
 				}
-				if (!found) { buffer.add(new LetterData(1, c)); }
+				if (!found) { result.add(new LetterData(1, c)); }
 			}
-			buffer.sort(LetterData::compareTo);
+			result.sort(LetterData::compareTo);
+			return result;
+		}
 
-			StringBuilder checkSumBuffer = new StringBuilder();
+		boolean isDecoy() {
+			var letters = countLetters();
+			var checkSumBuffer = new StringBuilder(CHECKSUM_LENGTH);
 			for (int i = 0; i < CHECKSUM_LENGTH; ++i) {
-				checkSumBuffer.append(buffer.get(i).letter);
+				checkSumBuffer.append(letters.get(i).letter);
 			}
 
 			return !checkSumBuffer.toString().equals(checkSum);
@@ -133,7 +147,7 @@ public class Day04 extends Day00 {
 	}
 
 	public static class RoomList {
-		final static int MAX_LETTERS = 'z' - 'a' + 1;
+		final static int LETTER_COUNT = 'z' - 'a' + 1;
 		private List<Room> rooms;
 
 		RoomList(List<String> input) {
@@ -153,12 +167,12 @@ public class Day04 extends Day00 {
 		private static char shiftChar(char c, int by) {
 			if (c == '-') { return ' '; }
 			c += by;
-			if (c > 'z') { c -= MAX_LETTERS; }
+			if (c > 'z') { c -= LETTER_COUNT; }
 			return c;
 		}
 
 		private static String decryptRoom(Room r) {
-			var shiftBy = r.sectorId % MAX_LETTERS;
+			var shiftBy = r.sectorId % LETTER_COUNT;
 			var result = new StringBuilder(r.name);
 
 			for (int i = 0; i < result.length(); ++i) {
@@ -168,17 +182,18 @@ public class Day04 extends Day00 {
 			return result.toString();
 		}
 
-		void printDecrypted() {
-			rooms.forEach(i -> System.out.println(decryptRoom(i)));
-		}
+		// To find out, what "North Pole objects" actually means ("northpole object storage")
+		// void printDecrypted() {
+		// rooms.forEach(i -> System.out.println(decryptRoom(i)));
+		// }
 
 		int findRoom(String ROOM_NAME) {
-			// final String ROOM_NAME = "North Pole objects";
-
 			for (var i : rooms) {
-				if (i.name.length() == ROOM_NAME.length()) {
-					if (decryptRoom(i).equals(ROOM_NAME)) { return i.sectorId; }
-				}
+				// @formatter:off
+				if (i.name.length() == ROOM_NAME.length() // faster to check first, if possible match is there
+				&& decryptRoom(i).equals(ROOM_NAME))
+					{ return i.sectorId; }
+				// @formatter:on
 			}
 
 			throw new RuntimeException("Room not found");
@@ -200,6 +215,7 @@ public class Day04 extends Day00 {
 				"qzmt-zixmtkozy-ivhz-343[zimth]"
 		);
 		// @formatter:on
+		final String findStr = "very encrypted name";
 
 		io.printTest(new Room(input.get(0)).isDecoy(), false);
 		io.printTest(new Room(input.get(1)).isDecoy(), false);
@@ -208,15 +224,16 @@ public class Day04 extends Day00 {
 
 		var rooms = new RoomList(input);
 		io.printTest(rooms.sumSectorIds(), 1857);
-		io.printTest(RoomList.decryptRoom(new Room("qzmt-zixmtkozy-ivhz-343[zimth]")), "very encrypted name");
-		io.printTest(rooms.findRoom("very encrypted name"), 343);
+		io.printTest(RoomList.decryptRoom(new Room(input.get(4))), findStr);
+		io.printTest(rooms.findRoom(findStr), 343);
 	}
 
 	@Override
 	public void solvePuzzle() {
+		final String findStr = "northpole object storage";
 		var rooms = new RoomList(io.readAllLines());
 		io.printResult(rooms.sumSectorIds(), 278221);
-		io.printResult(rooms.findRoom("northpole object storage"), 278221);
+		io.printResult(rooms.findRoom(findStr), 267);
 	}
 
 }

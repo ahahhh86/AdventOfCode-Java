@@ -118,122 +118,110 @@ public class Day02 extends Day00 {
 	}
 
 	private static enum NumPadSquare implements NumPad {
-		NUM1,
-		NUM2,
-		NUM3,
+		//@formatter:off
+		N1, N2, N3,
+		N4, N5, N6,
+		N7, N8, N9;
+		//@formatter:on
 
-		NUM4,
-		NUM5,
-		NUM6,
-
-		NUM7,
-		NUM8,
-		NUM9;
-
-		private static final int LAST_CHAR = 3;
+		private static final int LAST_CHAR = 1;
 
 		@Override
 		public String toString() {
-			return "" + this.name().charAt(LAST_CHAR);
+			return name().substring(LAST_CHAR);
 		}
 
 		@Override
 		public NumPadSquare move(Direction d) {
 			return switch (d) {
+			//@formatter:off
 			case UP -> switch (this) {
-			case NUM1, NUM2, NUM3 -> this;
-			default -> values()[ordinal() - 3];
+				case N1, N2, N3 -> this;
+				default -> values()[ordinal() - 3];
 			};
 
 			case LEFT -> switch (this) {
-			case NUM1, NUM4, NUM7 -> this;
-			default -> values()[ordinal() - 1];
+				case N1, N4, N7 -> this;
+				default -> values()[ordinal() - 1];
 			};
 
 			case DOWN -> switch (this) {
-			case NUM7, NUM8, NUM9 -> this;
-			default -> values()[ordinal() + 3];
+				case N7, N8, N9 -> this;
+				default -> values()[ordinal() + 3];
 			};
 
 			case RIGHT -> switch (this) {
-			case NUM3, NUM6, NUM9 -> this;
-			default -> values()[ordinal() + 1];
+				case N3, N6, N9 -> this;
+				default -> values()[ordinal() + 1];
 			};
 
 			default -> throw new IllegalArgumentException("Unexpected value: " + d);
+			//@formatter:on
 			};
 		}
 	}
 
 	private static enum NumPadDiamond implements NumPad {
-		NUM1,
+		//@formatter:off
+		        N1,
+		    N2, N3, N4,
+		N5, N6, N7, N8, N9,
+		    NA, NB, NC,
+		        ND;
+		//@formatter:on
 
-		NUM2,
-		NUM3,
-		NUM4,
-
-		NUM5,
-		NUM6,
-		NUM7,
-		NUM8,
-		NUM9,
-
-		NUMA,
-		NUMB,
-		NUMC,
-
-		NUMD;
-
-		private static final int LAST_CHAR = 3;
+		private static final int LAST_CHAR = 1;
 
 		@Override
 		public String toString() {
-			return "" + this.name().charAt(LAST_CHAR);
+			return this.name().substring(LAST_CHAR);
 		}
 
 		@Override
 		public NumPadDiamond move(Direction d) {
 			return switch (d) {
+			//@formatter:off
 			case UP -> switch (this) {
-			case NUM1, NUM2, NUM4, NUM5, NUM9 -> this;
-			case NUM3 -> NUM1;
-			case NUMD -> NUMB;
-			default -> values()[ordinal() - 4];
+				case N1, N2, N4, N5, N9 -> this;
+				case N3 -> N1;
+				case ND -> NB;
+				default -> values()[ordinal() - 4];
 			};
 
 			case LEFT -> switch (this) {
-			case NUM1, NUM2, NUM5, NUMA, NUMD -> this;
-			default -> values()[ordinal() - 1];
+				case N1, N2, N5, NA, ND -> this;
+				default -> values()[ordinal() - 1];
 			};
 
 			case DOWN -> switch (this) {
-			case NUM5, NUM9, NUMA, NUMC, NUMD -> this;
-			case NUM1 -> NUM3;
-			case NUMB -> NUMD;
-			default -> values()[ordinal() + 4];
+				case N5, N9, NA, NC, ND -> this;
+				case N1 -> N3;
+				case NB -> ND;
+				default -> values()[ordinal() + 4];
 			};
 
 			case RIGHT -> switch (this) {
-			case NUM1, NUM4, NUM9, NUMC, NUMD -> this;
-			default -> values()[ordinal() + 1];
+				case N1, N4, N9, NC, ND -> this;
+				default -> values()[ordinal() + 1];
 			};
 
 			default -> throw new IllegalArgumentException("Unexpected value: " + d);
+			//@formatter:on
 			};
 		}
 	}
 
 	private static class BathroomCode {
-		private static final NumPadSquare START_POS_SQUARE = NumPadSquare.NUM5;
-		private static final NumPadDiamond START_POS_DIAMOND = NumPadDiamond.NUM5;
+		private static final NumPadSquare START_POS_SQUARE = NumPadSquare.N5;
+		private static final NumPadDiamond START_POS_DIAMOND = NumPadDiamond.N5;
 		List<List<Direction>> instructions;
 
 		BathroomCode(List<String> input) {
 			instructions = new ArrayList<>(input.size());
-			input.forEach(i -> {
-				List<Direction> buffer = new ArrayList<>(i.length());
-				for (int j = 0; j < i.length(); ++j) {
-					buffer.add(Direction.fromChar(i.charAt(j)));
+			input.forEach(str -> {
+				var buffer = new ArrayList<Direction>(str.length());
+				for (int i = 0; i < str.length(); ++i) {
+					buffer.add(Direction.fromChar(str.charAt(i)));
 				}
 				instructions.add(buffer);
 			});
@@ -241,23 +229,23 @@ public class Day02 extends Day00 {
 
 		private String findCode(NumPad np) {
 			var result = new StringBuilder("");
+			var buffer = np;
+
 			for (var i : instructions) {
 				for (Direction j : i) {
-					np = np.move(j);
+					buffer = buffer.move(j);
 				}
-				result.append(np);
+				result.append(buffer);
 			}
 			return result.toString();
 		}
 
 		String findCodeSquare() {
-			var np = START_POS_SQUARE;
-			return findCode(np);
+			return findCode(START_POS_SQUARE);
 		}
 
 		String findCodeDiamond() {
-			var np = START_POS_DIAMOND;
-			return findCode(np);
+			return findCode(START_POS_DIAMOND);
 		}
 	}
 
