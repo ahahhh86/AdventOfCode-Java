@@ -68,14 +68,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import aoc.Date;
 import aoc.Day00;
 
 
 
 public class Day05 extends Day00 {
 	public Day05() {
-		super(Date.Year.YEAR2016, Date.Day.DAY05);
+		super(2016, 5);
 	}
 
 	private static class DoorCode {

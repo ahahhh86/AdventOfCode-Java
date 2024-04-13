@@ -82,7 +82,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import aoc.Date;
 import aoc.Day00;
 
 
@@ -254,7 +253,7 @@ public class Day02 extends Day00 {
 	}
 
 	public Day02() {
-		super(Date.Year.YEAR2016, Date.Day.DAY02);
+		super(2016, 2);
 	}
 
 	@Override

@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import aoc.Date;
 import aoc.Day00;
 import aoc.Position;
 
@@ -182,7 +181,7 @@ public class Day01 extends Day00 {
 	}
 
 	public Day01() {
-		super(Date.Year.YEAR2016, Date.Day.DAY01);
+		super(2016, 1);
 	}
 
 	@Override
@@ -202,7 +201,7 @@ public class Day01 extends Day00 {
 
 	@Override
 	public void solvePuzzle() {
-		var c = new City(io.readOneLine(", "));
+		var c = new City(io.readAllLines(", "));
 		io.printResult(c.getShortestRoutePart1(), 236);
 		io.printResult(c.getShortestRoutePart2(), 182);
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,18 +20,22 @@ public class IO {
 
 	private static final String testFormat = "\t%02d | %8s | %24s | %24s | %10s%n";
 
-	// private Date date;
 	private long time;
 	private final String filename;
 	private int partCount = 0;
 	private int testCount = 0;
 	private int failCount = 0;
 
-	public IO(Date date) {
-		// this.date = date;
+	public IO(int year, int day) {
+		validate(year, day);
 		time = System.currentTimeMillis();
-		filename = "input/" + date.year.toFilename() + date.day.toFilename();
-		System.out.println(date + ": ");
+		filename = String.format("input/%4d/Day%02d.txt", year, day);
+		System.out.printf("Year %4d | Day %02d:%n", year, day);
+	}
+
+	private static void validate(int year, int day) {
+		assert (0 < day || day < 26) : "day has to be between 1 and 25";
+		assert (2014 < year) : "year has to be above 2015";
 	}
 
 	private long elapsedTime() {
@@ -39,23 +44,28 @@ public class IO {
 		return (time - oldTime);
 	}
 
-	public List<String> readAllLines() {
 
+
+	public List<String> readAllLines() {
 		try {
 			return Files.readAllLines(Paths.get(filename));
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException(); // TODO better exception
+			throw new RuntimeException(); // TODO better exception or exit
 		}
 	}
 
-	public List<String> readOneLine(String delimiter) {
+	public ArrayList<String> readAllLines(String delimiter) {
 		try {
-			String str = Files.readAllLines(Paths.get(filename)).getFirst();
-			return Arrays.asList(str.split(delimiter));
+			var strs = Files.readAllLines(Paths.get(filename));
+			var result = new ArrayList<String>();
+			for (var line : strs) {
+				result.addAll(Arrays.asList(line.split(delimiter)));
+			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException(); // TODO better exception
+			throw new RuntimeException(); // TODO better exception or exit
 		}
 	}
 

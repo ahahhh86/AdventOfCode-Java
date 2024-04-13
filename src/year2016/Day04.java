@@ -52,8 +52,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import aoc.Date;
 import aoc.Day00;
+import aoc.LetterStatistic;
 
 
 
@@ -61,28 +61,6 @@ public class Day04 extends Day00 {
 	private static final int CHECKSUM_LENGTH = 5;
 
 	private static class Room {
-		private static class LetterData implements Comparable<LetterData> {
-			Integer count;
-			Character letter;
-
-			LetterData(int c, char l) {
-				count = c;
-				letter = l;
-			}
-
-			@Override
-			public int compareTo(LetterData o) {
-				// sort: higher count -> lower count, a -> z
-				return (count == o.count) ? letter.compareTo(o.letter) : o.count.compareTo(count);
-			}
-
-			// For Debugging
-			// @Override
-			// public String toString() {
-			// return "[" + count + "|" + letter + "]";
-			// }
-		}
-
 		final String name;
 		final int sectorId;
 		final String checkSum;
@@ -110,28 +88,10 @@ public class Day04 extends Day00 {
 			}
 		}
 
-		private List<LetterData> countLetters() {
-			var result = new ArrayList<LetterData>(name.length());
-			for (int i = 0; i < name.length(); ++i) {
-				char c = name.charAt(i);
-				if (c == '-') { continue; }
-				boolean found = false;
-
-				for (var j : result) {
-					if (j.letter == c) {
-						++j.count;
-						found = true;
-						break;
-					}
-				}
-				if (!found) { result.add(new LetterData(1, c)); }
-			}
-			result.sort(LetterData::compareTo);
-			return result;
-		}
-
 		boolean isDecoy() {
-			var letters = countLetters();
+			var letters = new LetterStatistic(name);
+			letters.remove('-');
+
 			var checkSumBuffer = new StringBuilder(CHECKSUM_LENGTH);
 			for (int i = 0; i < CHECKSUM_LENGTH; ++i) {
 				checkSumBuffer.append(letters.get(i).letter);
@@ -202,7 +162,7 @@ public class Day04 extends Day00 {
 	}
 
 	public Day04() {
-		super(Date.Year.YEAR2016, Date.Day.DAY04);
+		super(2016, 4);
 	}
 
 	@Override
