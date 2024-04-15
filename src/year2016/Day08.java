@@ -80,6 +80,7 @@ import aoc.Grid;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day08 extends Day00 {
 	private static enum Operation {
 		RECT,
@@ -235,7 +236,7 @@ public class Day08 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		//@formatter:off
 		var input = Arrays.asList(
 				"rect 3x2",

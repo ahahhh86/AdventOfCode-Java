@@ -61,11 +61,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import aoc.CharStatistic;
 import aoc.Day00;
-import aoc.LetterStatistic;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day06 extends Day00 {
 	private static class RepeatingMessage {
 		List<String> input;
@@ -100,9 +101,9 @@ public class Day06 extends Day00 {
 			var modifiedResult = new StringBuilder(input.size());
 
 			for (var i : inputList) {
-				var buffer = new LetterStatistic(i);
-				result.append(buffer.getFirst().letter);
-				modifiedResult.append(buffer.getLast().letter);
+				var buffer = new CharStatistic(i);
+				result.append(buffer.getFirst().getChar());
+				modifiedResult.append(buffer.getLast().getChar());
 			}
 
 			return new String[]{result.toString(), modifiedResult.toString()};
@@ -114,7 +115,7 @@ public class Day06 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		//@formatter:off
 		var input = new ArrayList<>(Arrays.asList(
 			"eedadn",

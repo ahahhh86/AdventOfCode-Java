@@ -59,6 +59,7 @@ import aoc.Day00;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day07 extends Day00 {
 	private static class IpAddress {
 		private List<String> address;
@@ -172,7 +173,7 @@ public class Day07 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		//@formatter:off
 		var input1 = Arrays.asList(new String[]{
 				"abba[mnop]qrst",

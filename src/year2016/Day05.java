@@ -72,11 +72,8 @@ import aoc.Day00;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day05 extends Day00 {
-	public Day05() {
-		super(2016, 5);
-	}
-
 	private static class DoorCode {
 		private final int PASSWORD_LENGTH = 8;
 
@@ -191,8 +188,12 @@ public class Day05 extends Day00 {
 		}
 	}
 
+	public Day05() {
+		super(2016, 5);
+	}
+
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		final String DOOR_ID = "abc";
 		var x = new DoorCode(DOOR_ID);
 		io.printTest(x.new Door1().findPassword(), "18f47a30");

@@ -8,16 +8,22 @@ import java.util.Objects;
  * Provides a simple class with two numbers to store position data.
  */
 public class Position {
+	/**
+	 * position of x direction
+	 */
 	public int x;
+	/**
+	 * position of y direction
+	 */
 	public int y;
 
 	/**
-	 * Creates Point with given parameters
+	 * constructor
 	 * 
 	 * @param x
-	 *            X position
+	 *          X position
 	 * @param y
-	 *            Y position
+	 *          Y position
 	 */
 	public Position(int x, int y) {
 		this.x = x;
@@ -25,31 +31,31 @@ public class Position {
 	}
 
 	/**
-	 * Creates Point where x and y are equal
+	 * constructor where x and y are equal
 	 * 
 	 * @param p
-	 *            position
+	 *          position
 	 */
 	public Position(int p) {
 		this(p, p);
 	}
 
 	/**
-	 * Copy constructor
+	 * (deep) copy constructor
 	 * 
 	 * @param p
-	 *            original Position
+	 *          original Position
 	 */
 	public Position(Position p) {
 		this(p.x, p.y);
 	}
 
 	/**
-	 * multiplies the positions by the specified value
+	 * multiplies both values (x,y) by the specified value
 	 * 
 	 * @param value
-	 *            multiplicator
-	 * @return {@code this}
+	 *          multiplicator
+	 * @return the result
 	 */
 	public Position scale(int value) {
 		x *= value;
@@ -58,44 +64,40 @@ public class Position {
 	}
 
 	/**
-	 * Adds both values to {@code this}
+	 * Adds a two positions
 	 * 
-	 * @param point
-	 *            point is added
-	 * @return {@code this}
+	 * @param pos
+	 *          position is added
+	 * @return the result
 	 */
-	public Position add(Position point) {
-		x += point.x;
-		y += point.y;
+	public Position add(Position pos) {
+		x += pos.x;
+		y += pos.y;
 		return this;
 	}
 
-	/**
-	 * checks if {@code this} point to the same position as {@code p}
-	 */
-	public boolean equals(Position p) {
-		return this.x == p.x && this.y == p.y;
-	}
-
 	@Override
-	/**
-	 * converts to a {@code String}
-	 */
 	public String toString() {
 		return x + "|" + y;
 	}
 
 	@Override
-	/**
-	 * creates a hashCode. For use in collections
-	 */
 	public int hashCode() {
 		return Objects.hash(x, y);
 	}
 
+
 	/**
-	 * checks if {@ obj} is the same as {@code this}. For use in collections
+	 * specialised equals() method, if both objects are of Position class
+	 * 
+	 * @param p
+	 *          compare to
+	 * @return true if values of the positions are equal
 	 */
+	public boolean equals(Position p) {
+		return this.x == p.x && this.y == p.y;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) { return true; }

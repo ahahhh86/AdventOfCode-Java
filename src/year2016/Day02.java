@@ -86,6 +86,7 @@ import aoc.Day00;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day02 extends Day00 {
 	private static enum Direction {
 		UP,
@@ -257,7 +258,7 @@ public class Day02 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		var bc = new BathroomCode(Arrays.asList("ULL", "RRDDD", "LURDL", "UUUUD"));
 		io.printTest(bc.findCodeSquare(), "1985");
 		io.printTest(bc.findCodeDiamond(), "5DB3");

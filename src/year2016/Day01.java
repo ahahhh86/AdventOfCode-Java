@@ -56,6 +56,7 @@ import aoc.Position;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day01 extends Day00 {
 	private static enum Turn {
 		RIGHT,
@@ -185,7 +186,7 @@ public class Day01 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		var c = new City(Arrays.asList("R2", "L3"));
 		io.printTest(c.getShortestRoutePart1(), 5);
 

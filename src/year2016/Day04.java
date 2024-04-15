@@ -52,11 +52,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import aoc.CharStatistic;
 import aoc.Day00;
-import aoc.LetterStatistic;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day04 extends Day00 {
 	private static final int CHECKSUM_LENGTH = 5;
 
@@ -89,12 +90,12 @@ public class Day04 extends Day00 {
 		}
 
 		boolean isDecoy() {
-			var letters = new LetterStatistic(name);
+			var letters = new CharStatistic(name);
 			letters.remove('-');
 
 			var checkSumBuffer = new StringBuilder(CHECKSUM_LENGTH);
 			for (int i = 0; i < CHECKSUM_LENGTH; ++i) {
-				checkSumBuffer.append(letters.get(i).letter);
+				checkSumBuffer.append(letters.get(i).getChar());
 			}
 
 			return !checkSumBuffer.toString().equals(checkSum);
@@ -166,7 +167,7 @@ public class Day04 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		// @formatter:off
 		var input = Arrays.asList(
 				"aaaaa-bbb-z-y-x-123[abxyz]",

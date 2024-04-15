@@ -49,6 +49,7 @@ import aoc.Day00;
 
 
 
+@SuppressWarnings("javadoc")
 public class Day03 extends Day00 {
 	private static final int SIDE_COUNT = 3;
 
@@ -147,7 +148,7 @@ public class Day03 extends Day00 {
 	}
 
 	@Override
-	public void performTests() {
+	protected void testPuzzle() {
 		var tri = new Triangle(5, 10, 25);
 		io.printTest(tri.isValid(), false);
 

@@ -10,7 +10,13 @@ import java.util.List;
 
 
 
+/**
+ * handles the input (*.txt file) and console output of the puzzles
+ */
 public class IO {
+	/**
+	 * are we debugging the puzzles (are the tests printed)? atm hardcoded
+	 */
 	public static final boolean DEBUG_MODE = true;
 
 	private static final String DEFAULT_COLOUR = "\u001B[39m";
@@ -26,6 +32,14 @@ public class IO {
 	private int testCount = 0;
 	private int failCount = 0;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param year
+	 *          year of the puzzle
+	 * @param day
+	 *          day of the puzzle
+	 */
 	public IO(int year, int day) {
 		validate(year, day);
 		time = System.currentTimeMillis();
@@ -46,6 +60,11 @@ public class IO {
 
 
 
+	/**
+	 * Gets the content of the input file for the specified date
+	 * 
+	 * @return all lines of the file
+	 */
 	public List<String> readAllLines() {
 		try {
 			return Files.readAllLines(Paths.get(filename));
@@ -55,6 +74,13 @@ public class IO {
 		}
 	}
 
+	/**
+	 * Gets the content of the input file for the specified date
+	 * 
+	 * @param delimiter
+	 *          delimiter
+	 * @return all lines of the file split at the delimiter
+	 */
 	public ArrayList<String> readAllLines(String delimiter) {
 		try {
 			var strs = Files.readAllLines(Paths.get(filename));
@@ -71,6 +97,15 @@ public class IO {
 
 
 
+	/**
+	 * prints the result of the puzzle. If in debug mode also checks versus an expected value and returns how long the
+	 * calculation took
+	 * 
+	 * @param result
+	 *          the result of the puzzle
+	 * @param expected
+	 *          the expected result of the puzzle
+	 */
 	public void printResult(Object result, Object expected) {
 		++partCount;
 		if (DEBUG_MODE) {
@@ -82,6 +117,9 @@ public class IO {
 		}
 	}
 
+	/**
+	 * Initialises the tests: resets the time, prints the header of the test table and changes colour
+	 */
 	public void startTests() {
 		if (!DEBUG_MODE) { return; }
 
@@ -93,6 +131,15 @@ public class IO {
 		System.out.printf(testForm, "#", "success", "result", "expected", "time");
 	}
 
+	/**
+	 * if in debug mode: prints the test of the puzzle, checks if it has the expected result and how long the calculations
+	 * took
+	 * 
+	 * @param result
+	 *          the result of the test
+	 * @param expected
+	 *          the expected result of the test
+	 */
 	public void printTest(Object result, Object expected) {
 		if (!DEBUG_MODE) { return; }
 
@@ -103,6 +150,9 @@ public class IO {
 		System.out.printf(testFormat, testCount, success, result, expected, elapsed);
 	}
 
+	/**
+	 * prints the test results and returns to the default colour
+	 */
 	public void showTestResults() {
 		if (!DEBUG_MODE) { return; }
 
