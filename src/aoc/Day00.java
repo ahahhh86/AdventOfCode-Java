@@ -25,19 +25,32 @@ public abstract class Day00 {
 	protected abstract void testPuzzle();
 
 	/**
-	 * Starts the tests, if in debug mode
-	 */
-	public final void performTests() {
-		if (!IO.DEBUG_MODE) { return; }
-		io.startTests();
-		testPuzzle();
-		io.showTestResults();
-	}
-
-	/**
 	 * Solves the puzzle. Each sub class has to implement own method.
 	 */
-	public abstract void solvePuzzle();
+	protected abstract void solvePuzzle();
+
+	/**
+	 * Solves a defined puzzle
+	 * 
+	 * @param year
+	 *          year of the puzzle
+	 * @param day
+	 *          day of the puzzle
+	 */
+	public static void solvePuzzle(int year, int day) {
+		try {
+			@SuppressWarnings("deprecation") // TODO find not deprecated method
+			Day00 d = (Day00) Class.forName(String.format("year%4d.Day%02d", year, day)).newInstance();
+			if (IO.DEBUG_MODE) {
+				d.io.startTests();
+				d.testPuzzle();
+				d.io.showTestResults();
+			}
+			d.solvePuzzle();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Solves the specified puzzle.
@@ -45,10 +58,12 @@ public abstract class Day00 {
 	 * @param args
 	 *          atm no meaning
 	 */
-	// TODO: solve all puzzles or use args to determine which puzzle to solve
 	public static void main(String[] args) {
-		Day00 d = new year2016.Day08();
-		d.performTests();
-		d.solvePuzzle();
+		solvePuzzle(2016, 8);
+
+		// for (int i = 1; i < 9; ++i) {
+		// solvePuzzle(2016, i);
+		// System.out.print("\n\n\n");
+		// }
 	}
 }

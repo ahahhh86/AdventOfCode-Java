@@ -84,13 +84,13 @@ public class Day05 extends Day00 {
 			doorId = id;
 		}
 
-		private byte[] getMD5(int index) { // CHECK do List<Byte> affect performance?
+		private byte[] getMD5(int index) {
 			var str = doorId + index;
 			try {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				return md.digest(str.getBytes("UTF-8"));
-			} catch (@SuppressWarnings("unused") UnsupportedEncodingException | NoSuchAlgorithmException e) {
-				// e.printStackTrace();
+			} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+				e.printStackTrace();
 				throw new RuntimeException("could not get MD5 hash");
 			}
 		}
@@ -151,6 +151,7 @@ public class Day05 extends Day00 {
 
 		class Door2 {
 			private final byte[] INVALID_PASSWORD = {};
+			private final char PASSWORD_TOKEN = '*';
 
 			byte[] checkPassword(int index) {
 				var buffer = getMD5(index);
@@ -160,26 +161,29 @@ public class Day05 extends Day00 {
 				return INVALID_PASSWORD;
 			}
 
-			String findPassword() { // TODO refactoring
-				var result = new StringBuilder("********");
-				assert result.length() == PASSWORD_LENGTH : "Size of the result should be the password length.";
+			private String checkUsedPasswords() {
+				var result = new StringBuilder(String.valueOf(PASSWORD_TOKEN).repeat(PASSWORD_LENGTH));
 
 				for (var i : indexList) {
 					var buffer = checkPassword(i);
-					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == '*') {
+					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
 						result.setCharAt(buffer[0], byteToChar(buffer[1]));
 					}
 				}
+				return result.toString();
+			}
 
+			String findPassword() {
+				var result = new StringBuilder(checkUsedPasswords());
 				var index = indexList.getLast();
 
 				while (true) {
 					++index;
 					var buffer = checkPassword(index);
 
-					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == '*') {
+					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
 						result.setCharAt(buffer[0], byteToChar(buffer[1]));
-						if (result.indexOf("*") < 0) { break; }
+						if (result.indexOf(String.valueOf(PASSWORD_TOKEN)) < 0) { break; }
 					}
 				}
 

@@ -79,18 +79,15 @@ public class Day03 extends Day00 {
 			// @formatter:on
 		}
 
-		// For Debugging
-		// @Override
-		// public String toString() {
-		// return String.format("[%d|%d|%d]", sides.get(0), sides.get(1), sides.get(2));
-		// }
+		@Override
+		public String toString() {
+			return String.format("[%d|%d|%d]", sides.get(0), sides.get(1), sides.get(2));
+		}
 	}
 
 	private static List<Triangle> readFileHorizontal(List<String> input) {
 		var result = new ArrayList<Triangle>(input.size());
-		input.forEach(i -> {
-			result.add(new Triangle(i));
-		});
+		input.forEach(i -> result.add(new Triangle(i)));
 		return result;
 	}
 
@@ -126,21 +123,14 @@ public class Day03 extends Day00 {
 			);
 			//@formatter:on
 			buffer = transpose(buffer);
-
-			for (var line : buffer) {
-				result.add(new Triangle(line));
-			}
+			buffer.forEach(line -> result.add(new Triangle(line)));
 		}
 
 		return result;
 	}
 
-	private static int countValid(List<Triangle> triangles) {
-		var result = 0;
-		for (var i : triangles) {
-			if (i.isValid()) { ++result; }
-		}
-		return result;
+	private static long countValid(List<Triangle> triangles) {
+		return triangles.stream().filter(i -> i.isValid()).count();
 	}
 
 	public Day03() {
@@ -169,10 +159,10 @@ public class Day03 extends Day00 {
 	public void solvePuzzle() {
 		var input = io.readAllLines();
 		var triangles = readFileHorizontal(input);
-		io.printResult(countValid(triangles), 983);
+		io.printResult(countValid(triangles), 983L);
 
 		triangles = readFileVertical(input);
-		io.printResult(countValid(triangles), 1836);
+		io.printResult(countValid(triangles), 1836L);
 	}
 
 }

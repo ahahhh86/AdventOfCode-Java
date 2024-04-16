@@ -62,9 +62,17 @@ public class Day04 extends Day00 {
 	private static final int CHECKSUM_LENGTH = 5;
 
 	private static class Room {
-		final String name;
-		final int sectorId;
-		final String checkSum;
+		private final String name;
+		private final int sectorId;
+		private final String checkSum;
+
+		public String getName() {
+			return name;
+		}
+
+		public int getSectorId() {
+			return sectorId;
+		}
 
 		Room(String input) {
 			var buffer = input.split("-(?=\\d)"); // split at "-[number]", but keep the number
@@ -95,21 +103,21 @@ public class Day04 extends Day00 {
 
 			var checkSumBuffer = new StringBuilder(CHECKSUM_LENGTH);
 			for (int i = 0; i < CHECKSUM_LENGTH; ++i) {
-				checkSumBuffer.append(letters.get(i).getChar());
+				checkSumBuffer.append(letters.get(i).chr());
 			}
 
 			return !checkSumBuffer.toString().equals(checkSum);
 		}
 
-		// For Debugging
-		// @Override
-		// public String toString() {
-		// return "[" + name + "|" + number + "|" + checkSum + "]";
-		// }
+		@Override
+		public String toString() {
+			return "[" + name + "|" + sectorId + "|" + checkSum + "]";
+		}
 	}
 
 	public static class RoomList {
 		final static int LETTER_COUNT = 'z' - 'a' + 1;
+
 		private List<Room> rooms;
 
 		RoomList(List<String> input) {
@@ -119,23 +127,19 @@ public class Day04 extends Day00 {
 		}
 
 		int sumSectorIds() {
-			int result = 0;
-			for (var i : rooms) {
-				result += i.sectorId;
-			}
-			return result;
+			return rooms.stream().mapToInt(Room::getSectorId).sum();
 		}
 
 		private static char shiftChar(char c, int by) {
 			if (c == '-') { return ' '; }
-			c += by;
-			if (c > 'z') { c -= LETTER_COUNT; }
-			return c;
+			char chr = (char) (c + by);
+			if (chr > 'z') { chr -= LETTER_COUNT; }
+			return chr;
 		}
 
 		private static String decryptRoom(Room r) {
-			var shiftBy = r.sectorId % LETTER_COUNT;
-			var result = new StringBuilder(r.name);
+			var shiftBy = r.getSectorId() % LETTER_COUNT;
+			var result = new StringBuilder(r.getName());
 
 			for (int i = 0; i < result.length(); ++i) {
 				result.setCharAt(i, shiftChar(result.charAt(i), shiftBy));
@@ -145,16 +149,16 @@ public class Day04 extends Day00 {
 		}
 
 		// To find out, what "North Pole objects" actually means ("northpole object storage")
-		// void printDecrypted() {
-		// rooms.forEach(i -> System.out.println(decryptRoom(i)));
-		// }
+		void printDecrypted() {
+			rooms.forEach(i -> System.out.println(decryptRoom(i)));
+		}
 
 		int findRoom(String ROOM_NAME) {
 			for (var i : rooms) {
 				// @formatter:off
-				if (i.name.length() == ROOM_NAME.length() // faster to check first, if possible match is there
+				if (i.getName().length() == ROOM_NAME.length() // faster to check first, if possible match is there
 				&& decryptRoom(i).equals(ROOM_NAME))
-					{ return i.sectorId; }
+					{ return i.getSectorId(); }
 				// @formatter:on
 			}
 
@@ -186,6 +190,7 @@ public class Day04 extends Day00 {
 
 		var rooms = new RoomList(input);
 		io.printTest(rooms.sumSectorIds(), 1857);
+
 		io.printTest(RoomList.decryptRoom(new Room(input.get(4))), findStr);
 		io.printTest(rooms.findRoom(findStr), 343);
 	}

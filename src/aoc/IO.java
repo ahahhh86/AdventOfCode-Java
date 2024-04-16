@@ -70,7 +70,7 @@ public class IO {
 			return Files.readAllLines(Paths.get(filename));
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException(); // TODO better exception or exit
+			throw new RuntimeException("Could not read file :" + filename);
 		}
 	}
 
@@ -91,7 +91,7 @@ public class IO {
 			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException(); // TODO better exception or exit
+			throw new RuntimeException("Could not read file :" + filename);
 		}
 	}
 

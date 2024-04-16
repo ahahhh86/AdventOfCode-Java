@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 
@@ -123,6 +124,20 @@ public class Grid<E> implements Iterable<E> {
 	 */
 	public Position size() {
 		return new Position(width, height);
+	}
+
+	/**
+	 * @return stream of the underlying list
+	 */
+	public Stream<E> stream() {
+		return list.stream();
+	}
+
+	/**
+	 * @return the underlying list
+	 */
+	public List<E> list() {
+		return Collections.unmodifiableList(list);
 	}
 
 	@Override

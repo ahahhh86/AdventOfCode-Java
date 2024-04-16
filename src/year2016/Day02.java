@@ -104,17 +104,16 @@ public class Day02 extends Day00 {
 			};
 		}
 
-		// For Debugging
-		// @Override
-		// public String toString() {
-		// return switch (this) {
-		// case UP -> "^";
-		// case LEFT -> "<";
-		// case DOWN -> "v";
-		// case RIGHT -> ">";
-		// default -> throw new IllegalArgumentException("Unexpected value: " + this);
-		// };
-		// }
+		@Override
+		public String toString() {
+			return switch (this) {
+			case UP -> "^";
+			case LEFT -> "<";
+			case DOWN -> "v";
+			case RIGHT -> ">";
+			default -> throw new IllegalArgumentException("Unexpected value: " + this);
+			};
+		}
 	}
 
 	private static interface NumPad {
@@ -218,10 +217,12 @@ public class Day02 extends Day00 {
 	private static class BathroomCode {
 		private static final NumPadSquare START_POS_SQUARE = NumPadSquare.N5;
 		private static final NumPadDiamond START_POS_DIAMOND = NumPadDiamond.N5;
+
 		List<List<Direction>> instructions;
 
 		BathroomCode(List<String> input) {
 			instructions = new ArrayList<>(input.size());
+
 			input.forEach(str -> {
 				var buffer = new ArrayList<Direction>(str.length());
 				for (int i = 0; i < str.length(); ++i) {
@@ -232,12 +233,12 @@ public class Day02 extends Day00 {
 		}
 
 		private String findCode(NumPad np) {
-			var result = new StringBuilder("");
+			var result = new StringBuilder(instructions.size());
 			var buffer = np;
 
-			for (var i : instructions) {
-				for (Direction j : i) {
-					buffer = buffer.move(j);
+			for (List<Direction> i : instructions) {
+				for (Direction dir : i) {
+					buffer = buffer.move(dir);
 				}
 				result.append(buffer);
 			}

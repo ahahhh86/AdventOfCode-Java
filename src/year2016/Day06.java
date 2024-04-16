@@ -63,6 +63,7 @@ import java.util.List;
 
 import aoc.CharStatistic;
 import aoc.Day00;
+import aoc.TwoResults;
 
 
 
@@ -73,40 +74,49 @@ public class Day06 extends Day00 {
 
 		RepeatingMessage(List<String> in) {
 			input = in;
+			validate();
+		}
 
-			for (var i : input) {
-				if (i.length() != input.getFirst().length()) {
+		private void validate() {
+			for (var msg : input) {
+				if (msg.length() != input.getFirst().length()) {
 					throw new IllegalArgumentException("the size of the messages does not match");
 				}
 
-				for (int j = 0; j < i.length(); ++j) {
-					if (!Character.isLowerCase(i.charAt(j))) {
+				for (int i = 0; i < msg.length(); ++i) {
+					if (!Character.isLowerCase(msg.charAt(i))) {
 						throw new IllegalArgumentException("lower case characters expected");
 					}
 				}
 			}
 		}
 
-		String[] getMessage() {
-			var inputList = new ArrayList<String>(input.get(0).length());
+		private List<String> createMsgStatistics() {
+			var result = new ArrayList<String>(input.get(0).length());
+
 			for (int i = 0; i < input.get(0).length(); ++i) {
 				var buffer = new StringBuilder(input.size());
 				for (var j : input) {
 					buffer.append(j.charAt(i));
 				}
-				inputList.add(buffer.toString());
+				result.add(buffer.toString());
 			}
 
-			var result = new StringBuilder(input.size());
-			var modifiedResult = new StringBuilder(input.size());
+			return result;
+		}
 
-			for (var i : inputList) {
+		TwoResults<String> getMessage() {
+			var msgStatistics = createMsgStatistics();
+			var result = new TwoResults<>(new StringBuilder(input.size()), new StringBuilder(input.size()));
+
+			for (var i : msgStatistics) {
 				var buffer = new CharStatistic(i);
-				result.append(buffer.getFirst().getChar());
-				modifiedResult.append(buffer.getLast().getChar());
+
+				result.part1().append(buffer.getFirst().chr()); // most common letter
+				result.part2().append(buffer.getLast().chr());// least common letter
 			}
 
-			return new String[]{result.toString(), modifiedResult.toString()};
+			return new TwoResults<>(result.part1().toString(), result.part2().toString());
 		}
 	}
 
@@ -139,16 +149,16 @@ public class Day06 extends Day00 {
 
 		var msg = new RepeatingMessage(input);
 		var x = msg.getMessage();
-		io.printTest(x[0], "easter");
-		io.printTest(x[1], "advent");
+		io.printTest(x.part1(), "easter");
+		io.printTest(x.part2(), "advent");
 	}
 
 	@Override
 	public void solvePuzzle() {
 		var msg = new RepeatingMessage(io.readAllLines());
 		var x = msg.getMessage();
-		io.printResult(x[0], "xdkzukcf");
-		io.printResult(x[1], "cevsgyvd");
+		io.printResult(x.part1(), "xdkzukcf");
+		io.printResult(x.part2(), "cevsgyvd");
 	}
 
 }

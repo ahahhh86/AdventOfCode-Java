@@ -134,24 +134,24 @@ public class Day08 extends Day00 {
 	}
 
 	private static class Screen extends Grid<Boolean> {
-		List<Instruction> instructions;
+		private List<Instruction> instructions;
 
 		Screen(int width, int height, List<String> input) {
 			super(width, height, false);
 			instructions = new ArrayList<>(input.size());
-			for (var line : input) {
-				instructions.add(new Instruction(line));
-			}
+			input.forEach(line -> instructions.add(new Instruction(line)));
 		}
 
 		int countPixel() {
-			int result = 0;
-			var i = iterator();
-			while (i.hasNext()) {
-				var o = i.next();
-				if (o) { ++result; }
+			return Collections.frequency(list(), true);
+		}
+
+		private void rect(int a, int b) {
+			for (int i = 0; i < a; ++i) {
+				for (int j = 0; j < b; ++j) {
+					set(i, j, true);
+				}
 			}
-			return result;
 		}
 
 		private void rotateRow(int row, int value) {
@@ -181,11 +181,7 @@ public class Day08 extends Day00 {
 		private void performInstruction(Instruction instruction) {
 			switch (instruction.operation) {
 			case RECT :
-				for (int i = 0; i < instruction.a; ++i) {
-					for (int j = 0; j < instruction.b; ++j) {
-						set(i, j, true);
-					}
-				}
+				rect(instruction.a, instruction.b);
 				break;
 			case ROTATE_ROW :
 				rotateRow(instruction.a, instruction.b);
@@ -199,34 +195,27 @@ public class Day08 extends Day00 {
 		}
 
 		public void performInstructions() {
-			for (var i : instructions) {
-				performInstruction(i);
-			}
+			instructions.forEach(i -> performInstruction(i));
 		}
 
 		@Override
 		public String toString() {
-			final String ON_COLOUR = "\u001B[47m";
-			final String OFF_COLOUR = "\u001B[40m";
+			final boolean COLORED_OUTPUT = true;
+			final String ON_STRING = COLORED_OUTPUT ? "\u001B[47m  " : "#";
+			final String OFF_STRING = COLORED_OUTPUT ? "\u001B[40m  " : " ";
 			final String DEFAULT_COLOUR = "\u001B[0m";
 
-			var result = new StringBuilder("");
+			var result = new StringBuilder();
 			var i = iterator();
-			int count = 0;
 
-			while (i.hasNext()) {
-				var o = i.next();
-				if (count % 5 == 0 && count % 50 != 0) { result.append(OFF_COLOUR + " "); }
+			for (int count = 0; i.hasNext(); ++count) {
 				if (count % 50 == 0 && count != 0) { result.append('\n'); }
-				++count;
-				if (o) {
-					result.append(ON_COLOUR + " ");
-				} else {
-					result.append(OFF_COLOUR + " ");
-				}
+				if (count % 5 == 0) { result.append(OFF_STRING); }
+
+				result.append(i.next() ? ON_STRING : OFF_STRING);
 			}
 
-			result.append(DEFAULT_COLOUR);
+			if (COLORED_OUTPUT) { result.append(DEFAULT_COLOUR); }
 			return result.toString();
 		}
 	}
@@ -256,7 +245,8 @@ public class Day08 extends Day00 {
 		var screen = new Screen(50, 6, io.readAllLines());
 		screen.performInstructions();
 		io.printResult(screen.countPixel(), 128);
-		System.out.println("\n" + screen); // EOARGPHYAO
+		System.out.println("\t02 | expected: EOARGPHYAO");
+		System.out.println("\n" + screen);
 	}
 
 }

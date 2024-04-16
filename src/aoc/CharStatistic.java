@@ -3,6 +3,7 @@ package aoc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 
@@ -15,8 +16,8 @@ public class CharStatistic {
 	 * remembers how often a character was used
 	 */
 	public static class CharData implements Comparable<CharData> {
-		final Character chr;
-		Integer count = 1;
+		private Character chr;
+		private Long count = 1L;
 
 		/**
 		 * (deep) copy constructor
@@ -26,38 +27,36 @@ public class CharStatistic {
 		 */
 		public CharData(CharData source) {
 			chr = source.chr.charValue();
-			count = source.count.intValue();
+			count = source.count.longValue();
 		}
-
-		// not yet needed
-		// public LetterData(char letter, int count) {
-		// this.letter = letter;
-		// this.count = count;
-		// }
 
 		/**
 		 * constructor
 		 * 
 		 * @param chr
-		 *          letter to remember
+		 *          character
+		 * @param count
+		 *          number of times chr is present
 		 */
-		public CharData(char chr) {
+		// not yet needed
+		public CharData(char chr, long count) {
 			this.chr = chr;
+			this.count = count;
 		}
 
 		/**
 		 * @return character
 		 */
-		public Character getChar() {
+		public char chr() {
 			return chr;
 		}
 
 		/**
 		 * @return how often the character is used
 		 */
-		public Integer getCount() {
-			return count;
-		}
+		// public long count() {
+		// return count;
+		// }
 
 		@Override
 		public int compareTo(CharData o) {
@@ -88,23 +87,12 @@ public class CharStatistic {
 		statistics.sort(CharData::compareTo);
 	}
 
-	private int getIndex(char chr) {
-		for (int i = 0; i < statistics.size(); ++i) {
-			if (statistics.get(i).chr == chr) { return i; }
-		}
-		return -1;
-	}
-
 	private void countLetters() {
-		for (int i = 0; i < string.length(); ++i) {
-			char c = string.charAt(i);
-			var found = getIndex(c);
-
-			if (found < 0) {
-				statistics.add(new CharStatistic.CharData(c));
-			} else {
-				++statistics.get(found).count;
-			}
+		String uniqueChrs = string.chars().distinct().mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
+		for (int i = 0; i < uniqueChrs.length(); ++i) {
+			var chr = uniqueChrs.charAt(i);
+			var count = string.chars().filter(c -> chr == c).count();
+			statistics.add(new CharData(chr, count));
 		}
 	}
 
@@ -154,6 +142,6 @@ public class CharStatistic {
 	 *          letter to be removed
 	 */
 	public void remove(char letter) {
-		statistics.removeIf(i -> i.chr == letter);
+		statistics.removeIf(i -> i.chr() == letter);
 	}
 }

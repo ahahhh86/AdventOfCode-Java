@@ -6,7 +6,6 @@
  * While snooping around the local network of EBHQ, you compile a list of IP addresses (they're IPv7, of
  * course; IPv6 is much too limited). You'd like to figure out which IPs support TLS (transport-layer snooping).
  *
- *
  * An IP supports TLS if it has an Autonomous Bridge Bypass Annotation, or ABBA. An ABBA is any four-character
  * sequence which consists of a pair of two different characters followed by the reverse of that pair, such
  * as xyyx or abba. However, the IP also must not have an ABBA within any hypernet sequences, which are
@@ -62,22 +61,22 @@ import aoc.Day00;
 @SuppressWarnings("javadoc")
 public class Day07 extends Day00 {
 	private static class IpAddress {
-		private List<String> address;
-		private List<String> hypernetSequences;
+		private List<String> outsideBrackets;
+		private List<String> insideBrackets;
 
 		IpAddress(String ipAdress) {
-			address = new ArrayList<>();
-			hypernetSequences = new ArrayList<>();
-			var buffer = Arrays.asList(ipAdress.split("[\\[\\]]"));
-			boolean writeAdress = true;
+			outsideBrackets = new ArrayList<>();
+			insideBrackets = new ArrayList<>();
+			var splitAddress = Arrays.asList(ipAdress.split("[\\[\\]]"));
+			boolean outside = true;
 
-			for (var i : buffer) {
-				if (writeAdress) {
-					address.add(i);
+			for (var addressPart : splitAddress) {
+				if (outside) {
+					outsideBrackets.add(addressPart);
 				} else {
-					hypernetSequences.add(i);
+					insideBrackets.add(addressPart);
 				}
-				writeAdress = !writeAdress;
+				outside = !outside;
 			}
 		}
 
@@ -99,11 +98,11 @@ public class Day07 extends Day00 {
 		}
 
 		boolean hasTLS() {
-			for (var i : hypernetSequences) {
-				if (containsABBA(i)) { return false; }
+			for (var str : insideBrackets) {
+				if (containsABBA(str)) { return false; }
 			}
-			for (var i : address) {
-				if (containsABBA(i)) { return true; }
+			for (var str : outsideBrackets) {
+				if (containsABBA(str)) { return true; }
 			}
 			return false;
 		}
@@ -112,7 +111,7 @@ public class Day07 extends Day00 {
 			final int ABA_LENGTH = 3;
 			var result = new ArrayList<String>();
 
-			for (var str : address) {
+			for (var str : outsideBrackets) {
 				if (str.length() < ABA_LENGTH) { continue; }
 				int loopEnd = str.length() - ABA_LENGTH + 1;
 				for (int i = 0; i < loopEnd; ++i) {
@@ -126,7 +125,7 @@ public class Day07 extends Day00 {
 		}
 
 		private boolean containsBAB(String bab) {
-			for (var str : hypernetSequences) {
+			for (var str : insideBrackets) {
 				if (str.indexOf(bab) >= 0) { return true; }
 			}
 			return false;
@@ -146,25 +145,15 @@ public class Day07 extends Day00 {
 
 		AddressList(List<String> input) {
 			list = new ArrayList<>(input.size());
-			for (var line : input) {
-				list.add(new IpAddress(line));
-			}
+			input.forEach(str -> list.add(new IpAddress(str)));
 		}
 
-		int countTLS() { // TODO combine the count Methods
-			int result = 0;
-			for (var adr : list) {
-				if (adr.hasTLS()) { ++result; }
-			}
-			return result;
+		long countTLS() {
+			return list.stream().filter(i -> i.hasTLS()).count();
 		}
 
-		int countSSL() {
-			int result = 0;
-			for (var adr : list) {
-				if (adr.hasSSL()) { ++result; }
-			}
-			return result;
+		long countSSL() {
+			return list.stream().filter(i -> i.hasSSL()).count();
 		}
 	}
 
@@ -202,7 +191,7 @@ public class Day07 extends Day00 {
 		io.printTest(test.hasTLS(), true);
 
 		var tests = new AddressList(input1);
-		io.printTest(tests.countTLS(), 2);
+		io.printTest(tests.countTLS(), 2L);
 
 
 		test = new IpAddress(input2.get(0));
@@ -218,14 +207,14 @@ public class Day07 extends Day00 {
 		io.printTest(test.hasSSL(), true);
 
 		tests = new AddressList(input2);
-		io.printTest(tests.countSSL(), 3);
+		io.printTest(tests.countSSL(), 3L);
 	}
 
 	@Override
 	public void solvePuzzle() {
 		var adresses = new AddressList(io.readAllLines());
-		io.printResult(adresses.countTLS(), 110);
-		io.printResult(adresses.countSSL(), 242);
+		io.printResult(adresses.countTLS(), 110L);
+		io.printResult(adresses.countSSL(), 242L);
 	}
 
 }

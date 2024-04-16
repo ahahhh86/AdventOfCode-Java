@@ -107,6 +107,7 @@ public class Day01 extends Day00 {
 	private static class City {
 		private static final Direction START_DIRECTION = Direction.NORTH;
 		private static final Position START_POS = new Position(0, 0);
+
 		private List<Instruction> instructions;
 
 		City(List<String> input) {
@@ -144,6 +145,7 @@ public class Day01 extends Day00 {
 
 			private Position walkOnce(Instruction instruction) {
 				direction = direction.turn(instruction.turn);
+
 				for (int i = 0; i < instruction.length; ++i) {
 					var newPos = new Position(positions.getLast());
 					newPos.add(direction.getVector());
@@ -162,7 +164,7 @@ public class Day01 extends Day00 {
 					if (!pos.equals(INVALID_POS)) { return pos; }
 				}
 
-				throw new RuntimeException("Headquarter not found!"); // TODO better exception
+				throw new RuntimeException("Headquarter not found!");
 			}
 
 		}
