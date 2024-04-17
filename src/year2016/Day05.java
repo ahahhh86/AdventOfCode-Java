@@ -65,7 +65,7 @@ package year2016;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -75,10 +75,10 @@ import aoc.Day00;
 @SuppressWarnings("javadoc")
 public class Day05 extends Day00 {
 	private static class DoorCode {
-		private final int PASSWORD_LENGTH = 8;
+		private static final int PASSWORD_LENGTH = 8;
 
 		private final String doorId;
-		private List<Integer> indexList = new ArrayList<>(PASSWORD_LENGTH); // To boost part 2
+		private List<Integer> indexList = new LinkedList<>(); // To boost part 2
 
 		DoorCode(String id) {
 			doorId = id;
@@ -117,80 +117,85 @@ public class Day05 extends Day00 {
 			};
 		}
 
-		class Door1 {
-			private final char INVALID_PASSWORD = '\0';
+		String findPasswordDoor1() {
+			class Door1 {
+				private static final char INVALID_CHAR_DOOR1 = '\0';
 
-			private char checkPassword(int index) {
-				var buffer = getMD5(index);
-				if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) { return byteToChar(buffer[2]); }
-				return INVALID_PASSWORD;
-			}
+				StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
+				int index = 0;
 
-			String findPassword() {
-				var result = new StringBuilder(PASSWORD_LENGTH);
-				int index = -1;
+				private char checkChar() {
+					var buffer = getMD5(index);
+					if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) { return byteToChar(buffer[2]); }
+					return INVALID_CHAR_DOOR1;
+				}
 
-				for (int i = 0; i < PASSWORD_LENGTH; ++i) {
-					while (true) {
+				private char getChar() {
+					for (;; ++index) {
+						var buffer = checkChar();
+						if (buffer == INVALID_CHAR_DOOR1) { continue; }
+
+						indexList.add(index);
 						++index;
-						var buffer = checkPassword(index);
-
-						if (buffer != INVALID_PASSWORD) {
-							indexList.add(index);
-							result.append(buffer);
-							break;
-						}
-
+						return buffer;
 					}
 				}
 
-				return result.toString();
+				Door1() {
+					for (int i = 0; i < PASSWORD_LENGTH; ++i) {
+						password.append(getChar());
+					}
+				}
 			}
+
+			return new Door1().password.toString();
 		}
 
+		String findPasswordDoor2() {
+			class Door2 {
+				private static final byte[] INVALID_CHAR_DOOR2 = {};
+				private static final char PASSWORD_TOKEN = '*';
 
-		class Door2 {
-			private final byte[] INVALID_PASSWORD = {};
-			private final char PASSWORD_TOKEN = '*';
+				StringBuilder password = new StringBuilder(checkUsedIndices());
+				int index = indexList.getLast() + 1;
 
-			byte[] checkPassword(int index) {
-				var buffer = getMD5(index);
-				if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) {
-					return new byte[]{buffer[2], (byte) ((buffer[3] & 0xF0) >> 4)};
+				byte[] getChar(@SuppressWarnings("hiding") int index) {
+					var buffer = getMD5(index);
+					if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) {
+						return new byte[]{buffer[2], (byte) ((buffer[3] & 0xF0) >> 4)};
+					}
+					return INVALID_CHAR_DOOR2;
 				}
-				return INVALID_PASSWORD;
-			}
 
-			private String checkUsedPasswords() {
-				var result = new StringBuilder(String.valueOf(PASSWORD_TOKEN).repeat(PASSWORD_LENGTH));
+				private StringBuilder checkUsedIndices() {
+					var result = new StringBuilder(String.valueOf(PASSWORD_TOKEN).repeat(PASSWORD_LENGTH));
 
-				for (var i : indexList) {
-					var buffer = checkPassword(i);
-					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
-						result.setCharAt(buffer[0], byteToChar(buffer[1]));
+					for (var i : indexList) {
+						var buffer = getChar(i);
+						if (buffer != INVALID_CHAR_DOOR2 && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
+							result.setCharAt(buffer[0], byteToChar(buffer[1]));
+						}
+					}
+					return result;
+				}
+
+				Door2() {
+					for (;; ++index) {
+						var buffer = getChar(index);
+
+						if (buffer != INVALID_CHAR_DOOR2 && buffer[0] < 8 && password.charAt(buffer[0]) == PASSWORD_TOKEN) {
+							password.setCharAt(buffer[0], byteToChar(buffer[1]));
+							if (password.indexOf(String.valueOf(PASSWORD_TOKEN)) < 0) { break; }
+						}
 					}
 				}
-				return result.toString();
 			}
 
-			String findPassword() {
-				var result = new StringBuilder(checkUsedPasswords());
-				var index = indexList.getLast();
-
-				while (true) {
-					++index;
-					var buffer = checkPassword(index);
-
-					if (buffer != INVALID_PASSWORD && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
-						result.setCharAt(buffer[0], byteToChar(buffer[1]));
-						if (result.indexOf(String.valueOf(PASSWORD_TOKEN)) < 0) { break; }
-					}
-				}
-
-				return result.toString();
-			}
+			return new Door2().password.toString();
 		}
 	}
+
+
 
 	public Day05() {
 		super(2016, 5);
@@ -199,17 +204,16 @@ public class Day05 extends Day00 {
 	@Override
 	protected void testPuzzle() {
 		final String DOOR_ID = "abc";
-		var x = new DoorCode(DOOR_ID);
-		io.printTest(x.new Door1().findPassword(), "18f47a30");
-		io.printTest(x.new Door2().findPassword(), "05ace8e3");
+		var code = new DoorCode(DOOR_ID);
+		io.printTest(code.findPasswordDoor1(), "18f47a30");
+		io.printTest(code.findPasswordDoor2(), "05ace8e3");
 	}
 
 	@Override
 	public void solvePuzzle() {
-		var input = io.readAllLines().getFirst();
-		var x = new DoorCode(input);
-		io.printResult(x.new Door1().findPassword(), "1a3099aa");
-		io.printResult(x.new Door2().findPassword(), "694190cd");
+		var x = new DoorCode(io.readAllLines().getFirst());
+		io.printResult(x.findPasswordDoor1(), "1a3099aa");
+		io.printResult(x.findPasswordDoor2(), "694190cd");
 	}
 
 }

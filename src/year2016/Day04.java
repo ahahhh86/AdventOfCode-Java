@@ -48,8 +48,9 @@
 
 package year2016;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.CharStatistic;
@@ -61,34 +62,11 @@ import aoc.Day00;
 public class Day04 extends Day00 {
 	private static final int CHECKSUM_LENGTH = 5;
 
-	private static class Room {
-		private final String name;
-		private final int sectorId;
-		private final String checkSum;
-
-		public String getName() {
-			return name;
-		}
-
-		public int getSectorId() {
-			return sectorId;
-		}
-
-		Room(String input) {
-			var buffer = input.split("-(?=\\d)"); // split at "-[number]", but keep the number
-			name = buffer[0];
-
-			buffer = buffer[1].split("[\\[\\]]"); // split at "[", also removes trailing "]"
-			sectorId = Integer.parseInt(buffer[0]);
-			checkSum = buffer[1];
-
-			verifyInput();
-		}
-
-		private void verifyInput() {
+	private static record Room(String name, int sectorId, String checkSum) {
+		Room {
 			for (int i = 0; i < name.length(); ++i) {
 				if (!(name.charAt(i) == '-' || Character.isLowerCase(name.charAt(i)))) {
-					throw new IllegalArgumentException("name has to be in lower case");
+					throw new IllegalArgumentException("name has to be in lower case or '-'");
 				}
 			}
 
@@ -109,9 +87,20 @@ public class Day04 extends Day00 {
 			return !checkSumBuffer.toString().equals(checkSum);
 		}
 
-		@Override
-		public String toString() {
-			return "[" + name + "|" + sectorId + "|" + checkSum + "]";
+		static Room create(String str) {
+			var buffer = str.split("-(?=\\d)"); // split at "-[number]", but keep the number
+			var name = buffer[0];
+			buffer = buffer[1].split("[\\[\\]]"); // split at "[", also removes trailing "]"
+			return new Room(name, Integer.parseInt(buffer[0]), buffer[1]);
+		}
+
+		static List<Room> createList(List<String> list) {
+			var buffer = new LinkedList<Room>();
+			list.forEach(str -> {
+				var room = Room.create(str);
+				if (!room.isDecoy()) { buffer.add(room); }
+			});
+			return Collections.unmodifiableList(buffer);
 		}
 	}
 
@@ -121,13 +110,11 @@ public class Day04 extends Day00 {
 		private List<Room> rooms;
 
 		RoomList(List<String> input) {
-			rooms = new ArrayList<>(input.size());
-			input.forEach(i -> rooms.add(new Room(i)));
-			rooms.removeIf(i -> i.isDecoy());
+			rooms = Room.createList(input);
 		}
 
 		int sumSectorIds() {
-			return rooms.stream().mapToInt(Room::getSectorId).sum();
+			return rooms.stream().mapToInt(Room::sectorId).sum();
 		}
 
 		private static char shiftChar(char c, int by) {
@@ -138,8 +125,8 @@ public class Day04 extends Day00 {
 		}
 
 		private static String decryptRoom(Room r) {
-			var shiftBy = r.getSectorId() % LETTER_COUNT;
-			var result = new StringBuilder(r.getName());
+			var shiftBy = r.sectorId() % LETTER_COUNT;
+			var result = new StringBuilder(r.name());
 
 			for (int i = 0; i < result.length(); ++i) {
 				result.setCharAt(i, shiftChar(result.charAt(i), shiftBy));
@@ -156,15 +143,17 @@ public class Day04 extends Day00 {
 		int findRoom(String ROOM_NAME) {
 			for (var i : rooms) {
 				// @formatter:off
-				if (i.getName().length() == ROOM_NAME.length() // faster to check first, if possible match is there
+				if (i.name().length() == ROOM_NAME.length() // faster to check first, if possible match is there
 				&& decryptRoom(i).equals(ROOM_NAME))
-					{ return i.getSectorId(); }
+					{ return i.sectorId(); }
 				// @formatter:on
 			}
 
 			throw new RuntimeException("Room not found");
 		}
 	}
+
+
 
 	public Day04() {
 		super(2016, 4);
@@ -183,15 +172,15 @@ public class Day04 extends Day00 {
 		// @formatter:on
 		final String findStr = "very encrypted name";
 
-		io.printTest(new Room(input.get(0)).isDecoy(), false);
-		io.printTest(new Room(input.get(1)).isDecoy(), false);
-		io.printTest(new Room(input.get(2)).isDecoy(), false);
-		io.printTest(new Room(input.get(3)).isDecoy(), true);
+		io.printTest(Room.create(input.get(0)).isDecoy(), false);
+		io.printTest(Room.create(input.get(1)).isDecoy(), false);
+		io.printTest(Room.create(input.get(2)).isDecoy(), false);
+		io.printTest(Room.create(input.get(3)).isDecoy(), true);
 
 		var rooms = new RoomList(input);
 		io.printTest(rooms.sumSectorIds(), 1857);
 
-		io.printTest(RoomList.decryptRoom(new Room(input.get(4))), findStr);
+		io.printTest(RoomList.decryptRoom(Room.create(input.get(4))), findStr);
 		io.printTest(rooms.findRoom(findStr), 343);
 	}
 

@@ -57,8 +57,8 @@
 
 package year2016;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.CharStatistic;
@@ -69,17 +69,10 @@ import aoc.TwoResults;
 
 @SuppressWarnings("javadoc")
 public class Day06 extends Day00 {
-	private static class RepeatingMessage {
-		List<String> input;
-
-		RepeatingMessage(List<String> in) {
-			input = in;
-			validate();
-		}
-
-		private void validate() {
-			for (var msg : input) {
-				if (msg.length() != input.getFirst().length()) {
+	private static record RepeatingMessage(List<String> messages) {
+		RepeatingMessage {
+			for (var msg : messages) {
+				if (msg.length() != messages.getFirst().length()) {
 					throw new IllegalArgumentException("the size of the messages does not match");
 				}
 
@@ -91,12 +84,12 @@ public class Day06 extends Day00 {
 			}
 		}
 
-		private List<String> createMsgStatistics() {
-			var result = new ArrayList<String>(input.get(0).length());
+		private List<String> createColumns() {
+			var result = new LinkedList<String>();
 
-			for (int i = 0; i < input.get(0).length(); ++i) {
-				var buffer = new StringBuilder(input.size());
-				for (var j : input) {
+			for (int i = 0; i < messages.get(0).length(); ++i) {
+				var buffer = new StringBuilder(messages.size());
+				for (var j : messages) {
 					buffer.append(j.charAt(i));
 				}
 				result.add(buffer.toString());
@@ -105,20 +98,23 @@ public class Day06 extends Day00 {
 			return result;
 		}
 
-		TwoResults<String> getMessage() {
-			var msgStatistics = createMsgStatistics();
-			var result = new TwoResults<>(new StringBuilder(input.size()), new StringBuilder(input.size()));
+		TwoResults<String> correctErrors() {
+			var msgColumn = createColumns();
+			var part1 = new StringBuilder(messages.size());
+			var part2 = new StringBuilder(messages.size());
 
-			for (var i : msgStatistics) {
-				var buffer = new CharStatistic(i);
+			msgColumn.forEach(str -> {
+				var stat = new CharStatistic(str);
 
-				result.part1().append(buffer.getFirst().chr()); // most common letter
-				result.part2().append(buffer.getLast().chr());// least common letter
-			}
+				part1.append(stat.getFirst().chr()); // most common letter
+				part2.append(stat.getLast().chr()); // least common letter
+			});
 
-			return new TwoResults<>(result.part1().toString(), result.part2().toString());
+			return new TwoResults<>(part1.toString(), part2.toString());
 		}
 	}
+
+
 
 	public Day06() {
 		super(2016, 6);
@@ -127,7 +123,7 @@ public class Day06 extends Day00 {
 	@Override
 	protected void testPuzzle() {
 		//@formatter:off
-		var input = new ArrayList<>(Arrays.asList(
+		var input = new LinkedList<>(Arrays.asList(
 			"eedadn",
 			"drvtee",
 			"eandsr",
@@ -147,18 +143,16 @@ public class Day06 extends Day00 {
 		));
 		//@formatter:on
 
-		var msg = new RepeatingMessage(input);
-		var x = msg.getMessage();
-		io.printTest(x.part1(), "easter");
-		io.printTest(x.part2(), "advent");
+		var msg = new RepeatingMessage(input).correctErrors();
+		io.printTest(msg.part1(), "easter");
+		io.printTest(msg.part2(), "advent");
 	}
 
 	@Override
 	public void solvePuzzle() {
-		var msg = new RepeatingMessage(io.readAllLines());
-		var x = msg.getMessage();
-		io.printResult(x.part1(), "xdkzukcf");
-		io.printResult(x.part2(), "cevsgyvd");
+		var msg = new RepeatingMessage(io.readAllLines()).correctErrors();
+		io.printResult(msg.part1(), "xdkzukcf");
+		io.printResult(msg.part2(), "cevsgyvd");
 	}
 
 }

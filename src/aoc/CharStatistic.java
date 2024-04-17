@@ -14,60 +14,17 @@ import java.util.stream.Collectors;
 public class CharStatistic {
 	/**
 	 * remembers how often a character was used
+	 * 
+	 * @param chr
+	 *          character
+	 * @param count
+	 *          number used
 	 */
-	public static class CharData implements Comparable<CharData> {
-		private Character chr;
-		private Long count = 1L;
-
-		/**
-		 * (deep) copy constructor
-		 * 
-		 * @param source
-		 *          copy from
-		 */
-		public CharData(CharData source) {
-			chr = source.chr.charValue();
-			count = source.count.longValue();
-		}
-
-		/**
-		 * constructor
-		 * 
-		 * @param chr
-		 *          character
-		 * @param count
-		 *          number of times chr is present
-		 */
-		// not yet needed
-		public CharData(char chr, long count) {
-			this.chr = chr;
-			this.count = count;
-		}
-
-		/**
-		 * @return character
-		 */
-		public char chr() {
-			return chr;
-		}
-
-		/**
-		 * @return how often the character is used
-		 */
-		// public long count() {
-		// return count;
-		// }
-
+	public static record CharData(Character chr, Long count) implements Comparable<CharData> {
 		@Override
 		public int compareTo(CharData o) {
 			// sort: higher count -> lower count, a -> z
 			return (count.equals(o.count)) ? chr.compareTo(o.chr) : o.count.compareTo(count);
-		}
-
-		// For Debugging
-		@Override
-		public String toString() {
-			return "['" + chr + "': " + count + "]";
 		}
 	}
 
@@ -101,7 +58,7 @@ public class CharStatistic {
 	 * 
 	 * @return the statistic
 	 */
-	public List<CharData> getStatistics() {
+	public List<CharData> getList() {
 		return Collections.unmodifiableList(statistics);
 	}
 
@@ -111,7 +68,7 @@ public class CharStatistic {
 	 * @return the first element of the statistic
 	 */
 	public CharData getFirst() {
-		return new CharData(statistics.getFirst());
+		return statistics.getFirst();
 	}
 
 	/**
@@ -120,7 +77,7 @@ public class CharStatistic {
 	 * @return the last element of the statistic
 	 */
 	public CharData getLast() {
-		return new CharData(statistics.getLast());
+		return statistics.getLast();
 	}
 
 	/**
@@ -132,7 +89,7 @@ public class CharStatistic {
 	 * @return an element of the statistic
 	 */
 	public CharData get(int index) {
-		return new CharData(statistics.get(index));
+		return statistics.get(index);
 	}
 
 	/**

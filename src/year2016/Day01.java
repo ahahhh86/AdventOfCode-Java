@@ -47,8 +47,9 @@
 
 package year2016;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -74,114 +75,114 @@ public class Day01 extends Day00 {
 	private static record Instruction(Turn turn, int length) {
 		Instruction(String in) {
 			this(Turn.fromChar(in.charAt(0)), Integer.parseInt(in.substring(1)));
+			if (length < 1) { throw new IllegalArgumentException("Length ahould be >0 (" + length + ")"); }
+		}
+
+		static List<Instruction> createList(List<String> list) {
+			var buffer = new LinkedList<Instruction>();
+			list.forEach(str -> buffer.add(new Instruction(str)));
+			return Collections.unmodifiableList(buffer);
 		}
 	}
 
-	private static enum Direction {
-		NORTH,
-		EAST,
-		SOUTH,
-		WEST;
+	private static class Route {
+		private static enum Direction {
+			NORTH,
+			EAST,
+			SOUTH,
+			WEST;
 
-		Position getVector() {
-			return switch (this) {
-			case NORTH -> new Position(1, 0);
-			case EAST -> new Position(0, 1);
-			case SOUTH -> new Position(-1, 0);
-			case WEST -> new Position(0, -1);
-			default -> throw new IllegalArgumentException("Unexpected value: " + name());
-			};
+			Position getVector() {
+				return switch (this) {
+				case NORTH -> new Position(1, 0);
+				case EAST -> new Position(0, 1);
+				case SOUTH -> new Position(-1, 0);
+				case WEST -> new Position(0, -1);
+				default -> throw new IllegalArgumentException("Unexpected value: " + name());
+				};
+			}
+
+			Direction turn(Turn turn) {
+				return switch (this) {
+				case NORTH -> (turn == Turn.RIGHT) ? EAST : WEST;
+				case EAST -> (turn == Turn.RIGHT) ? SOUTH : NORTH;
+				case SOUTH -> (turn == Turn.RIGHT) ? WEST : EAST;
+				case WEST -> (turn == Turn.RIGHT) ? NORTH : SOUTH;
+				default -> throw new IllegalArgumentException("Unexpected value: " + name());
+				};
+			}
 		}
 
-		Direction turn(Turn turn) {
-			return switch (this) {
-			case NORTH -> (turn == Turn.RIGHT) ? EAST : WEST;
-			case EAST -> (turn == Turn.RIGHT) ? SOUTH : NORTH;
-			case SOUTH -> (turn == Turn.RIGHT) ? WEST : EAST;
-			case WEST -> (turn == Turn.RIGHT) ? NORTH : SOUTH;
-			default -> throw new IllegalArgumentException("Unexpected value: " + name());
-			};
-		}
-	}
-
-	private static class City {
 		private static final Direction START_DIRECTION = Direction.NORTH;
 		private static final Position START_POS = new Position(0, 0);
 
-		private List<Instruction> instructions;
+		private final List<Instruction> instructions;
 
-		City(List<String> input) {
-			instructions = new ArrayList<>(input.size());
-			input.forEach(i -> instructions.add(new Instruction(i)));
+		Route(List<String> input) {
+			instructions = Instruction.createList(input);
 		}
 
-		private interface Part0 {
-			Position walk();
-		}
-
-		private class Part1 implements Part0 {
-			private Position pos = new Position(START_POS);
-			private Direction direction = START_DIRECTION;
-
-			private void walkOnce(Instruction i) {
-				direction = direction.turn(i.turn);
-				var newPos = direction.getVector().scale(i.length);
-				pos.add(newPos);
-			}
-
-			@Override
-			public Position walk() {
-				instructions.forEach(i -> walkOnce(i));
-				return new Position(pos);
-			}
-
-		}
-
-		private class Part2 implements Part0 {
-			private static final Position INVALID_POS = new Position(Integer.MIN_VALUE);
-
-			List<Position> positions = new ArrayList<>(Arrays.asList(START_POS));
-			private Direction direction = START_DIRECTION;
-
-			private Position walkOnce(Instruction instruction) {
-				direction = direction.turn(instruction.turn);
-
-				for (int i = 0; i < instruction.length; ++i) {
-					var newPos = new Position(positions.getLast());
-					newPos.add(direction.getVector());
-
-					if (positions.contains(newPos)) { return newPos; }
-					positions.add(newPos);
-				}
-
-				return new Position(INVALID_POS);
-			}
-
-			@Override
-			public Position walk() {
-				for (Instruction i : instructions) {
-					var pos = walkOnce(i);
-					if (!pos.equals(INVALID_POS)) { return pos; }
-				}
-
-				throw new RuntimeException("Headquarter not found!");
-			}
-
-		}
-
-		private static int getShortestRoute(Part0 p) {
-			var pos = p.walk();
+		private static int calculateDistance(Position pos) {
 			return Math.abs(pos.x) + Math.abs(pos.y);
 		}
 
 		int getShortestRoutePart1() {
-			return getShortestRoute(new Part1());
+			class Way {
+				private Position pos = new Position(START_POS);
+				private Direction direction = START_DIRECTION;
+
+				private void walkOnce(Instruction i) {
+					direction = direction.turn(i.turn);
+					var newPos = direction.getVector().scale(i.length);
+					pos.add(newPos);
+				}
+
+				public Position walk() {
+					instructions.forEach(i -> walkOnce(i));
+					return new Position(pos);
+				}
+			}
+
+			return calculateDistance(new Way().walk());
 		}
 
 		int getShortestRoutePart2() {
-			return getShortestRoute(new Part2());
+			class Way {
+				private static final Position INVALID_POS = new Position(Integer.MIN_VALUE);
+
+				List<Position> positions = new LinkedList<>(Arrays.asList(START_POS));
+				private Direction direction = START_DIRECTION;
+
+				private Position walkOnce(Instruction instruction) {
+					direction = direction.turn(instruction.turn);
+
+					for (int i = 0; i < instruction.length; ++i) {
+						var newPos = new Position(positions.getLast());
+						newPos.add(direction.getVector());
+
+						if (positions.contains(newPos)) { return newPos; }
+						positions.add(newPos);
+					}
+
+					return new Position(INVALID_POS);
+				}
+
+				public Position walk() {
+					for (Instruction i : instructions) {
+						var pos = walkOnce(i);
+						if (!pos.equals(INVALID_POS)) { return pos; }
+					}
+
+					throw new RuntimeException("Headquarter not found!");
+				}
+
+			}
+
+			return calculateDistance(new Way().walk());
 		}
 	}
+
+
 
 	public Day01() {
 		super(2016, 1);
@@ -189,22 +190,22 @@ public class Day01 extends Day00 {
 
 	@Override
 	protected void testPuzzle() {
-		var c = new City(Arrays.asList("R2", "L3"));
+		var c = new Route(Arrays.asList("R2", "L3"));
 		io.printTest(c.getShortestRoutePart1(), 5);
 
-		c = new City(Arrays.asList("R2", "R2", "R2"));
+		c = new Route(Arrays.asList("R2", "R2", "R2"));
 		io.printTest(c.getShortestRoutePart1(), 2);
 
-		c = new City(Arrays.asList("R5", "L5", "R5", "R3"));
+		c = new Route(Arrays.asList("R5", "L5", "R5", "R3"));
 		io.printTest(c.getShortestRoutePart1(), 12);
 
-		c = new City(Arrays.asList("R8", "R4", "R4", "R8"));
+		c = new Route(Arrays.asList("R8", "R4", "R4", "R8"));
 		io.printTest(c.getShortestRoutePart2(), 4);
 	}
 
 	@Override
 	public void solvePuzzle() {
-		var c = new City(io.readAllLines(", "));
+		var c = new Route(io.readAllLines(", "));
 		io.printResult(c.getShortestRoutePart1(), 236);
 		io.printResult(c.getShortestRoutePart2(), 182);
 	}

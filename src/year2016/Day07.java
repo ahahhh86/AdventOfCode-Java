@@ -50,8 +50,9 @@
 
 package year2016;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -60,26 +61,7 @@ import aoc.Day00;
 
 @SuppressWarnings("javadoc")
 public class Day07 extends Day00 {
-	private static class IpAddress {
-		private List<String> outsideBrackets;
-		private List<String> insideBrackets;
-
-		IpAddress(String ipAdress) {
-			outsideBrackets = new ArrayList<>();
-			insideBrackets = new ArrayList<>();
-			var splitAddress = Arrays.asList(ipAdress.split("[\\[\\]]"));
-			boolean outside = true;
-
-			for (var addressPart : splitAddress) {
-				if (outside) {
-					outsideBrackets.add(addressPart);
-				} else {
-					insideBrackets.add(addressPart);
-				}
-				outside = !outside;
-			}
-		}
-
+	private static record IpAddress(List<String> outsideBrackets, List<String> insideBrackets) {
 		private static boolean containsABBA(String str) {
 			final int ABBA_LENGTH = 4;
 			if (str.length() < ABBA_LENGTH) { return false; }
@@ -90,7 +72,7 @@ public class Day07 extends Day00 {
 				if ( str.charAt(i)     == str.charAt(i + 3)
 					&& str.charAt(i + 1) == str.charAt(i + 2)
 					&& str.charAt(i)     != str.charAt(i + 1)) {
-					return true;
+						return true;
 				}
 				//@formatter:on
 			}
@@ -107,9 +89,11 @@ public class Day07 extends Day00 {
 			return false;
 		}
 
-		private List<String> findABA() {// returns BABs
+
+
+		private List<String> findABA() {// returns List of BAB
 			final int ABA_LENGTH = 3;
-			var result = new ArrayList<String>();
+			var result = new LinkedList<String>();
 
 			for (var str : outsideBrackets) {
 				if (str.length() < ABA_LENGTH) { continue; }
@@ -132,20 +116,42 @@ public class Day07 extends Day00 {
 		}
 
 		boolean hasSSL() {
-			var babs = findABA();
-			for (var bab : babs) {
+			var babList = findABA();
+			for (var bab : babList) {
 				if (containsBAB(bab)) { return true; }
 			}
 			return false;
 		}
+
+
+
+		static IpAddress create(String ipAdress) {
+			var outsideBrackets = new LinkedList<String>();
+			var insideBrackets = new LinkedList<String>();
+			var splitAddress = Arrays.asList(ipAdress.split("[\\[\\]]"));
+			boolean outside = true;
+
+			for (var addressPart : splitAddress) {
+				if (outside) {
+					outsideBrackets.add(addressPart);
+				} else {
+					insideBrackets.add(addressPart);
+				}
+				outside = !outside;
+			}
+
+			return new IpAddress(Collections.unmodifiableList(outsideBrackets), Collections.unmodifiableList(insideBrackets));
+		}
 	}
+
+
 
 	private static class AddressList {
 		private List<IpAddress> list;
 
 		AddressList(List<String> input) {
-			list = new ArrayList<>(input.size());
-			input.forEach(str -> list.add(new IpAddress(str)));
+			list = new LinkedList<>();
+			input.forEach(str -> list.add(IpAddress.create(str)));
 		}
 
 		long countTLS() {
@@ -156,6 +162,8 @@ public class Day07 extends Day00 {
 			return list.stream().filter(i -> i.hasSSL()).count();
 		}
 	}
+
+
 
 	public Day07() {
 		super(2016, 7);
@@ -178,32 +186,32 @@ public class Day07 extends Day00 {
 			});
 		//@formatter:on
 
-		var test = new IpAddress(input1.get(0));
+		var test = IpAddress.create(input1.get(0));
 		io.printTest(test.hasTLS(), true);
 
-		test = new IpAddress(input1.get(1));
+		test = IpAddress.create(input1.get(1));
 		io.printTest(test.hasTLS(), false);
 
-		test = new IpAddress(input1.get(2));
+		test = IpAddress.create(input1.get(2));
 		io.printTest(test.hasTLS(), false);
 
-		test = new IpAddress(input1.get(3));
+		test = IpAddress.create(input1.get(3));
 		io.printTest(test.hasTLS(), true);
 
 		var tests = new AddressList(input1);
 		io.printTest(tests.countTLS(), 2L);
 
 
-		test = new IpAddress(input2.get(0));
+		test = IpAddress.create(input2.get(0));
 		io.printTest(test.hasSSL(), true);
 
-		test = new IpAddress(input2.get(1));
+		test = IpAddress.create(input2.get(1));
 		io.printTest(test.hasSSL(), false);
 
-		test = new IpAddress(input2.get(2));
+		test = IpAddress.create(input2.get(2));
 		io.printTest(test.hasSSL(), true);
 
-		test = new IpAddress(input2.get(3));
+		test = IpAddress.create(input2.get(3));
 		io.printTest(test.hasSSL(), true);
 
 		tests = new AddressList(input2);

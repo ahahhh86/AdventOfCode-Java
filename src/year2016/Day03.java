@@ -43,6 +43,8 @@ package year2016;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -53,22 +55,9 @@ import aoc.Day00;
 public class Day03 extends Day00 {
 	private static final int SIDE_COUNT = 3;
 
-	private static List<Integer> getLine(String in) {
-		var strList = new ArrayList<>(Arrays.asList(in.trim().split(" +")));
-		if (strList.size() != SIDE_COUNT) { throw new IllegalArgumentException("Triangle only works with 3 sides"); }
-
-		var result = new ArrayList<Integer>(SIDE_COUNT);
-		strList.forEach(i -> result.add(Integer.parseInt(i)));
-		return result;
-	}
-
 	private static record Triangle(List<Integer> sides) {
 		Triangle(int a, int b, int c) {
-			this(Arrays.asList(a, b, c));
-		}
-
-		Triangle(String in) {
-			this(getLine(in));
+			this(Collections.unmodifiableList(Arrays.asList(a, b, c)));
 		}
 
 		boolean isValid() {
@@ -79,15 +68,23 @@ public class Day03 extends Day00 {
 			// @formatter:on
 		}
 
-		@Override
-		public String toString() {
-			return String.format("[%d|%d|%d]", sides.get(0), sides.get(1), sides.get(2));
+		private static Triangle create(String str) {
+			return new Triangle(Collections.unmodifiableList(readLine(str)));
 		}
 	}
 
+	private static List<Integer> readLine(String in) {
+		var strList = new LinkedList<>(Arrays.asList(in.trim().split(" +")));
+		if (strList.size() != SIDE_COUNT) { throw new IllegalArgumentException("Triangle only works with 3 sides"); }
+
+		var result = new ArrayList<Integer>(SIDE_COUNT);
+		strList.forEach(i -> result.add(Integer.parseInt(i)));
+		return result;
+	}
+
 	private static List<Triangle> readFileHorizontal(List<String> input) {
-		var result = new ArrayList<Triangle>(input.size());
-		input.forEach(i -> result.add(new Triangle(i)));
+		var result = new LinkedList<Triangle>();
+		input.forEach(i -> result.add(Triangle.create(i)));
 		return result;
 	}
 
@@ -95,7 +92,7 @@ public class Day03 extends Day00 {
 		if (matrix.size() != matrix.get(0).size()) { throw new IllegalArgumentException("Invalid matrix size."); }
 
 		var loopEnd = matrix.size();
-		var result = new ArrayList<List<Integer>>(loopEnd);
+		var result = new LinkedList<List<Integer>>();
 
 		for (int i = 0; i < loopEnd; ++i) {
 			var buffer = new ArrayList<Integer>(loopEnd);
@@ -111,15 +108,15 @@ public class Day03 extends Day00 {
 	private static List<Triangle> readFileVertical(List<String> input) {
 		if (input.size() % SIDE_COUNT != 0) { throw new IllegalArgumentException("Invalid input size."); }
 
-		var result = new ArrayList<Triangle>(input.size());
+		var result = new LinkedList<Triangle>();
 		var loopEnd = input.size() - SIDE_COUNT + 1;
 
 		for (int i = 0; i < loopEnd; i += SIDE_COUNT) {
 			//@formatter:off
 			var buffer = Arrays.asList(
-					getLine(input.get(i)),
-					getLine(input.get(i + 1)),
-					getLine(input.get(i + 2))
+					readLine(input.get(i)),
+					readLine(input.get(i + 1)),
+					readLine(input.get(i + 2))
 			);
 			//@formatter:on
 			buffer = transpose(buffer);
@@ -132,6 +129,8 @@ public class Day03 extends Day00 {
 	private static long countValid(List<Triangle> triangles) {
 		return triangles.stream().filter(i -> i.isValid()).count();
 	}
+
+
 
 	public Day03() {
 		super(2016, 3);

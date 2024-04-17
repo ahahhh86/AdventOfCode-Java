@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -81,10 +81,10 @@ public class IO {
 	 *          delimiter
 	 * @return all lines of the file split at the delimiter
 	 */
-	public ArrayList<String> readAllLines(String delimiter) {
+	public List<String> readAllLines(String delimiter) {
 		try {
 			var strs = Files.readAllLines(Paths.get(filename));
-			var result = new ArrayList<String>();
+			var result = new LinkedList<String>();
 			for (var line : strs) {
 				result.addAll(Arrays.asList(line.split(delimiter)));
 			}

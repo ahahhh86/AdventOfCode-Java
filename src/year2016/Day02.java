@@ -78,8 +78,9 @@
 
 package year2016;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -114,8 +115,23 @@ public class Day02 extends Day00 {
 			default -> throw new IllegalArgumentException("Unexpected value: " + this);
 			};
 		}
+
+		static List<Direction> createList(String str) {
+			var buffer = new LinkedList<Direction>();
+			for (int i = 0; i < str.length(); ++i) {
+				buffer.add(Direction.fromChar(str.charAt(i)));
+			}
+			return Collections.unmodifiableList(buffer);
+		}
+
+		static List<List<Direction>> createList(List<String> list) {
+			var buffer = new LinkedList<List<Direction>>();
+			list.forEach(str -> buffer.add(createList(str)));
+			return Collections.unmodifiableList(buffer);
+		}
 	}
 
+	@FunctionalInterface
 	private static interface NumPad {
 		public NumPad move(Direction d);
 	}
@@ -136,8 +152,8 @@ public class Day02 extends Day00 {
 
 		@Override
 		public NumPadSquare move(Direction d) {
-			return switch (d) {
 			//@formatter:off
+			return switch (d) {
 			case UP -> switch (this) {
 				case N1, N2, N3 -> this;
 				default -> values()[ordinal() - 3];
@@ -159,8 +175,8 @@ public class Day02 extends Day00 {
 			};
 
 			default -> throw new IllegalArgumentException("Unexpected value: " + d);
-			//@formatter:on
 			};
+			//@formatter:on
 		}
 	}
 
@@ -182,8 +198,8 @@ public class Day02 extends Day00 {
 
 		@Override
 		public NumPadDiamond move(Direction d) {
-			return switch (d) {
 			//@formatter:off
+			return switch (d) {
 			case UP -> switch (this) {
 				case N1, N2, N4, N5, N9 -> this;
 				case N3 -> N1;
@@ -221,15 +237,7 @@ public class Day02 extends Day00 {
 		List<List<Direction>> instructions;
 
 		BathroomCode(List<String> input) {
-			instructions = new ArrayList<>(input.size());
-
-			input.forEach(str -> {
-				var buffer = new ArrayList<Direction>(str.length());
-				for (int i = 0; i < str.length(); ++i) {
-					buffer.add(Direction.fromChar(str.charAt(i)));
-				}
-				instructions.add(buffer);
-			});
+			instructions = Direction.createList(input);
 		}
 
 		private String findCode(NumPad np) {
@@ -254,6 +262,8 @@ public class Day02 extends Day00 {
 		}
 	}
 
+
+
 	public Day02() {
 		super(2016, 2);
 	}
@@ -263,7 +273,6 @@ public class Day02 extends Day00 {
 		var bc = new BathroomCode(Arrays.asList("ULL", "RRDDD", "LURDL", "UUUUD"));
 		io.printTest(bc.findCodeSquare(), "1985");
 		io.printTest(bc.findCodeDiamond(), "5DB3");
-
 	}
 
 	@Override

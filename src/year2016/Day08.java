@@ -73,6 +73,7 @@ package year2016;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
@@ -88,58 +89,50 @@ public class Day08 extends Day00 {
 		ROTATE_COLUMN;
 	}
 
-	private static class Instruction {
-		Operation operation;
-		int a;
-		int b;
-
-		Instruction(String str) {
-			var buffer = str.split(" ", 2);
-			switch (buffer[0]) {
-			case "rect" :
-				readRect(buffer[1]);
-				break;
-			case "rotate" :
-				readRotate(buffer[1]);
-				break;
-			default :
-				throw new IllegalArgumentException("Unexpected value: " + buffer[0]);
-			}
-		}
-
-		private void readRect(String str) {
-			operation = Operation.RECT;
+	private static record Instruction(Operation operation, int a, int b) {
+		private static Instruction createRect(String str) {
 			var buffer = str.split("x", 2);
-			a = Integer.parseInt(buffer[0]);
-			b = Integer.parseInt(buffer[1]);
+			return new Instruction(Operation.RECT, Integer.parseInt(buffer[0]), Integer.parseInt(buffer[1]));
 		}
 
-		private void readRotate(String str) {
+		private static Instruction createRotate(String str) {
 			var buffer = str.split(" ");
-			operation = switch (buffer[0]) {
+			var op = switch (buffer[0]) {
 			case "row" -> Operation.ROTATE_ROW;
 			case "column" -> Operation.ROTATE_COLUMN;
 			default -> throw new IllegalArgumentException("Unexpected value: Rotate " + buffer[0]);
 			};
 
-			a = Integer.parseInt(buffer[1].substring(2)); // ignore x= or y=
+			var a = Integer.parseInt(buffer[1].substring(2)); // ignore x= or y=
 			if (!buffer[2].equals("by")) { throw new IllegalArgumentException("Unexpected value: " + buffer[2]); }
-			b = Integer.parseInt(buffer[3]);
+			var b = Integer.parseInt(buffer[3]);
+			return new Instruction(op, a, b);
 		}
 
-		@Override
-		public String toString() {
-			return operation.name() + ": " + a + ", " + b;
+		static Instruction create(String str) {
+			var buffer = str.split(" ", 2);
+			return switch (buffer[0]) {
+			case "rect" -> createRect(buffer[1]);
+			case "rotate" -> createRotate(buffer[1]);
+			default -> throw new IllegalArgumentException("Unexpected value: " + buffer[0]);
+			};
+		}
+
+		static List<Instruction> createList(List<String> input) {
+			var buffer = new LinkedList<Instruction>();
+			input.forEach(line -> buffer.add(Instruction.create(line)));
+			return Collections.unmodifiableList(buffer);
 		}
 	}
+
+
 
 	private static class Screen extends Grid<Boolean> {
 		private List<Instruction> instructions;
 
 		Screen(int width, int height, List<String> input) {
 			super(width, height, false);
-			instructions = new ArrayList<>(input.size());
-			input.forEach(line -> instructions.add(new Instruction(line)));
+			instructions = Instruction.createList(input);
 		}
 
 		int countPixel() {
@@ -200,22 +193,25 @@ public class Day08 extends Day00 {
 
 		@Override
 		public String toString() {
-			final boolean COLORED_OUTPUT = true;
-			final String ON_STRING = COLORED_OUTPUT ? "\u001B[47m  " : "#";
-			final String OFF_STRING = COLORED_OUTPUT ? "\u001B[40m  " : " ";
-			final String DEFAULT_COLOUR = "\u001B[0m";
+			class C {
+				static final boolean COLORED_OUTPUT = true;
+				static final String ON_STRING = COLORED_OUTPUT ? "\u001B[47m  " : "#";
+				static final String OFF_STRING = COLORED_OUTPUT ? "\u001B[40m  " : " ";
+				static final String DEFAULT_COLOUR = "\u001B[0m";
+				static final int LETTER_WIDTH = 5;
+			}
 
 			var result = new StringBuilder();
 			var i = iterator();
 
 			for (int count = 0; i.hasNext(); ++count) {
-				if (count % 50 == 0 && count != 0) { result.append('\n'); }
-				if (count % 5 == 0) { result.append(OFF_STRING); }
+				if (count % size().x == 0 && count != 0) { result.append('\n'); }
+				if (count % C.LETTER_WIDTH == 0) { result.append(C.OFF_STRING); }
 
-				result.append(i.next() ? ON_STRING : OFF_STRING);
+				result.append(i.next() ? C.ON_STRING : C.OFF_STRING);
 			}
 
-			if (COLORED_OUTPUT) { result.append(DEFAULT_COLOUR); }
+			if (C.COLORED_OUTPUT) { result.append(C.DEFAULT_COLOUR); }
 			return result.toString();
 		}
 	}
