@@ -64,11 +64,9 @@ public class Day04 extends Day00 {
 
 	private static record Room(String name, int sectorId, String checkSum) {
 		Room {
-			for (int i = 0; i < name.length(); ++i) {
-				if (!(name.charAt(i) == '-' || Character.isLowerCase(name.charAt(i)))) {
-					throw new IllegalArgumentException("name has to be in lower case or '-'");
-				}
-			}
+			if (!name.matches("[\\-a-z]+")) { throw new IllegalArgumentException("name has to be in lower case or '-'"); }
+
+			if (!checkSum.matches("[a-z]+")) { throw new IllegalArgumentException("checkSum has to be in lower case"); }
 
 			if (checkSum.length() != CHECKSUM_LENGTH) {
 				throw new IllegalArgumentException("The length of the checkSum has to be " + CHECKSUM_LENGTH);

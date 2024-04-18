@@ -71,16 +71,14 @@ import aoc.TwoResults;
 public class Day06 extends Day00 {
 	private static record RepeatingMessage(List<String> messages) {
 		RepeatingMessage {
+			final int msgLength = messages.getFirst().length();
+
 			for (var msg : messages) {
-				if (msg.length() != messages.getFirst().length()) {
+				if (msg.length() != msgLength) {
 					throw new IllegalArgumentException("the size of the messages does not match");
 				}
 
-				for (int i = 0; i < msg.length(); ++i) {
-					if (!Character.isLowerCase(msg.charAt(i))) {
-						throw new IllegalArgumentException("lower case characters expected");
-					}
-				}
+				if (!msg.matches("[a-z]+")) { throw new IllegalArgumentException("lower case characters expected"); }
 			}
 		}
 
