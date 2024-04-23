@@ -84,7 +84,7 @@ public class Day09 extends Day00 {
 			if (!source.matches("[A-Z\\(0-9x\\)]+")) { throw new IllegalArgumentException("Unexpected input value"); }
 		}
 
-		private CompressionData decompressPart1(CompressionData d) { // TODO remove unnecessary operations
+		private CompressionData decompressPart1(CompressionData d) {
 			var start = d.start;
 			var size = d.size;
 
@@ -125,7 +125,7 @@ public class Day09 extends Day00 {
 			return decomprLength;
 		}
 
-		private CompressionData decompressPart2(CompressionData d) { // TODO remove unnecessary operations
+		private CompressionData decompressPart2(CompressionData d) {
 			var start = d.start;
 			var size = d.size;
 
