@@ -91,9 +91,8 @@ public class Day09 extends Day00 {
 			int posOpen = source.substring(start).indexOf('(');
 			if (posOpen < 0) { return new CompressionData(-1, size + source.length() - start); }
 
-			posOpen += start; // set to actual position
-			size += posOpen - start;
-			++posOpen; // continue after '('
+			size += posOpen;
+			posOpen += start + 1; // continue after '('
 			int posClose = source.substring(posOpen).indexOf(')') + posOpen;
 			var marker = source.substring(posOpen, posClose).split("x");
 			int repeatedLength = Integer.parseInt(marker[0]);
@@ -116,11 +115,11 @@ public class Day09 extends Day00 {
 
 			int repeatedLength = Integer.parseInt(buffer[1]);
 			int timesRepeated = Integer.parseInt(buffer[2]);
-			var x1 = buffer[0].length();
-			var x2 = getDecompressedLength(buffer[3].substring(0, repeatedLength));
-			var x3 = getDecompressedLength(buffer[3].substring(repeatedLength));
+			var lengthBefore = buffer[0].length();
+			var decompressedLength = getDecompressedLength(buffer[3].substring(0, repeatedLength));
+			var lengthAfter = getDecompressedLength(buffer[3].substring(repeatedLength));
 
-			var decomprLength = x1 + x2 * timesRepeated + x3;
+			var decomprLength = lengthBefore + decompressedLength * timesRepeated + lengthAfter;
 
 			return decomprLength;
 		}
@@ -132,9 +131,8 @@ public class Day09 extends Day00 {
 			int posOpen = source.substring(start).indexOf('(');
 			if (posOpen < 0) { return new CompressionData(-1, size + source.length() - start); }
 
-			posOpen += start; // set to actual position
-			size += posOpen - start;
-			++posOpen; // continue after '('
+			size += posOpen;
+			posOpen += start + 1; // continue after '('
 			int posClose = source.substring(posOpen).indexOf(')') + posOpen;
 			var marker = source.substring(posOpen, posClose).split("x");
 			int repeatedLength = Integer.parseInt(marker[0]);
