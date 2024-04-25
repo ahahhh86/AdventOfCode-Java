@@ -59,7 +59,7 @@ public abstract class Day00 {
 	 *          atm no meaning
 	 */
 	public static void main(String[] args) {
-		solvePuzzle(2016, 9);
+		solvePuzzle(2016, 12);
 
 		// for (int i = 1; i < 9; ++i) {
 		// solvePuzzle(2016, i);
