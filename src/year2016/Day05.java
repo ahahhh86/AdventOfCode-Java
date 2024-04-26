@@ -1,5 +1,5 @@
 /*
- * https://adventofcode.com/2016/day/4
+ * https://adventofcode.com/2016/day/5
  *
  * --- Day 5: How About a Nice Game of Chess? ---
  *
@@ -62,13 +62,11 @@
 
 package year2016;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
+import aoc.MD5Hash;
 
 
 
@@ -77,44 +75,11 @@ public class Day05 extends Day00 {
 	private static class DoorCode {
 		private static final int PASSWORD_LENGTH = 8;
 
-		private final String doorId;
+		private MD5Hash hashGenerator;
 		private List<Integer> indexList = new LinkedList<>(); // To boost part 2
 
 		DoorCode(String id) {
-			doorId = id;
-		}
-
-		private byte[] getMD5(int index) {
-			var str = doorId + index;
-			try {
-				MessageDigest md = MessageDigest.getInstance("MD5");
-				return md.digest(str.getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-				e.printStackTrace();
-				throw new RuntimeException("could not get MD5 hash");
-			}
-		}
-
-		private static char byteToChar(byte b) {
-			return switch (b) {
-			case 0 -> '0';
-			case 1 -> '1';
-			case 2 -> '2';
-			case 3 -> '3';
-			case 4 -> '4';
-			case 5 -> '5';
-			case 6 -> '6';
-			case 7 -> '7';
-			case 8 -> '8';
-			case 9 -> '9';
-			case 10 -> 'a';
-			case 11 -> 'b';
-			case 12 -> 'c';
-			case 13 -> 'd';
-			case 14 -> 'e';
-			case 15 -> 'f';
-			default -> throw new IllegalArgumentException("Unexpected value: " + b);
-			};
+			hashGenerator = new MD5Hash(id);
 		}
 
 		String findPasswordDoor1() {
@@ -125,8 +90,10 @@ public class Day05 extends Day00 {
 				int index = 0;
 
 				private char checkChar() {
-					var buffer = getMD5(index);
-					if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) { return byteToChar(buffer[2]); }
+					var buffer = hashGenerator.createHashByte(index);
+					if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) {
+						return Integer.toHexString(buffer[2]).charAt(0);
+					}
 					return INVALID_CHAR_DOOR1;
 				}
 
@@ -160,7 +127,7 @@ public class Day05 extends Day00 {
 				int index = indexList.getLast() + 1;
 
 				byte[] getChar(@SuppressWarnings("hiding") int index) {
-					var buffer = getMD5(index);
+					var buffer = hashGenerator.createHashByte(index);
 					if (buffer[0] == 0 && buffer[1] == 0 && (buffer[2] & 0xF0) == 0) {
 						return new byte[]{buffer[2], (byte) ((buffer[3] & 0xF0) >> 4)};
 					}
@@ -173,7 +140,7 @@ public class Day05 extends Day00 {
 					for (var i : indexList) {
 						var buffer = getChar(i);
 						if (buffer != INVALID_CHAR_DOOR2 && buffer[0] < 8 && result.charAt(buffer[0]) == PASSWORD_TOKEN) {
-							result.setCharAt(buffer[0], byteToChar(buffer[1]));
+							result.setCharAt(buffer[0], Integer.toHexString(buffer[1]).charAt(0));
 						}
 					}
 					return result;
@@ -184,7 +151,7 @@ public class Day05 extends Day00 {
 						var buffer = getChar(index);
 
 						if (buffer != INVALID_CHAR_DOOR2 && buffer[0] < 8 && password.charAt(buffer[0]) == PASSWORD_TOKEN) {
-							password.setCharAt(buffer[0], byteToChar(buffer[1]));
+							password.setCharAt(buffer[0], Integer.toHexString(buffer[1]).charAt(0));
 							if (password.indexOf(String.valueOf(PASSWORD_TOKEN)) < 0) { break; }
 						}
 					}
