@@ -66,7 +66,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import aoc.Day00;
-import aoc.MD5Hash;
+import aoc.MD5Generator;
 
 
 
@@ -75,11 +75,11 @@ public class Day05 extends Day00 {
 	private static class DoorCode {
 		private static final int PASSWORD_LENGTH = 8;
 
-		private MD5Hash hashGenerator;
+		private MD5Generator hashGenerator;
 		private List<Integer> indexList = new LinkedList<>(); // To boost part 2
 
 		DoorCode(String id) {
-			hashGenerator = new MD5Hash(id);
+			hashGenerator = new MD5Generator(id);
 		}
 
 		String findPasswordDoor1() {

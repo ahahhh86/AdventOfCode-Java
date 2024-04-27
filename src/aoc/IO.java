@@ -24,7 +24,7 @@ public class IO {
 	private static final String PASS_COLOUR = "\u001B[32m";
 	private static final String FAIL_COLOUR = "\u001B[31m";
 
-	private static final String testFormat = "\t%02d | %8s | %24s | %24s | %10s%n";
+	private static final String testFormat = "\t%02d | %8s | %32s | %32s | %10s%n";
 
 	private long time;
 	private final String filename;
