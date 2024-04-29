@@ -78,7 +78,7 @@ public class Day01 extends Day00 {
 			if (length < 1) { throw new IllegalArgumentException("Length ahould be >0 (" + length + ")"); }
 		}
 
-		static List<Instruction> createList(List<String> list) {
+		static List<Instruction> createList(List<String> list) { // CHECK how to make generic factory function
 			var buffer = new LinkedList<Instruction>();
 			list.forEach(str -> buffer.add(new Instruction(str)));
 			return Collections.unmodifiableList(buffer);

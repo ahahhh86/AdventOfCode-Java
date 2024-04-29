@@ -105,17 +105,6 @@ public class Day02 extends Day00 {
 			};
 		}
 
-		@Override
-		public String toString() {
-			return switch (this) {
-			case UP -> "^";
-			case LEFT -> "<";
-			case DOWN -> "v";
-			case RIGHT -> ">";
-			default -> throw new IllegalArgumentException("Unexpected value: " + this);
-			};
-		}
-
 		static List<Direction> createList(String str) {
 			var buffer = new LinkedList<Direction>();
 			for (int i = 0; i < str.length(); ++i) {
@@ -244,8 +233,8 @@ public class Day02 extends Day00 {
 			var result = new StringBuilder(instructions.size());
 			var buffer = np;
 
-			for (List<Direction> i : instructions) {
-				for (Direction dir : i) {
+			for (List<Direction> list : instructions) {
+				for (Direction dir : list) {
 					buffer = buffer.move(dir);
 				}
 				result.append(buffer);
